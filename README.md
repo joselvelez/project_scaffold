@@ -40,6 +40,10 @@ your-project/
 ├── assets/
 │   ├── scaffold-architecture.svg      ← system architecture diagram
 │   └── semver-decision-tree.svg       ← push command decision guide
+├── docs/                                ← project documentation (grows with the project)
+│   └── README.md
+├── bin/
+│   └── project                        ← CLI for read-only commands (no agent needed)
 ├── skills/
 │   ├── sync.sh                        ← generates all AI tool files
 │   └── scribe.md                      ← documentation specialist skill

@@ -14,3 +14,4 @@
 | [`CHANGELOG.md`](CHANGELOG.md) | Version history and change record |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Versioning and release process |
 | [`COMMANDS.md`](COMMANDS.md) | AI tool command reference |
+| [`docs/`](docs/) | Project documentation |

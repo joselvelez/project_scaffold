@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+#
+# bin/project — CLI for read-only project commands.
+#
+# Provides zero-cost terminal alternatives to agent commands
+# that only read and display project state. No AI tokens required.
+#
+# Usage:
+#   bin/project status     Show version, last changelog entry, unreleased changes
+#   bin/project commands   Display the full command reference
+#   bin/project help       Show this usage information
+#
+# This script must be run from the repository root.
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$(dirname "$SCRIPT_DIR")"
+
+# ── Guards ────────────────────────────────────────────────────────────────────
+
+require_file() {
+  local file="$1"
+  if [[ ! -f "$file" ]]; then
+    echo "Error: $file not found. Run this script from the repository root." >&2
+    exit 1
+  fi
+}
+
+# ── Subcommands ───────────────────────────────────────────────────────────────
+
+cmd_status() {
+  local version_file="$ROOT/VERSION"
+  local changelog_file="$ROOT/CHANGELOG.md"
+
+  require_file "$version_file"
+  require_file "$changelog_file"
+
+  local version
+  version="$(cat "$version_file")"
+  echo "Version: $version"
+  echo ""
+
+  # Extract the [Unreleased] section: lines between "## [Unreleased]" and "---"
+  local unreleased
+  unreleased="$(awk '
+    /^## \[Unreleased\]/ { found=1; next }
+    found && /^---$/     { exit }
+    found                { print }
+  ' "$changelog_file" | sed '/^$/d')"
+
+  if [[ -n "$unreleased" ]]; then
+    echo "Unreleased:"
+    echo "$unreleased"
+  else
+    echo "Unreleased: (none)"
+  fi
+  echo ""
+
+  # Extract the first versioned entry: heading + lines until the next "---"
+  local last_entry
+  last_entry="$(awk '
+    /^## \[Unreleased\]/ { next }
+    /^## \[[0-9]/ { found=1 }
+    found && /^---$/ { exit }
+    found { print }
+  ' "$changelog_file")"
+
+  if [[ -n "$last_entry" ]]; then
+    echo "Last release:"
+    echo "$last_entry"
+  else
+    echo "Last release: (none)"
+  fi
+}
+
+cmd_commands() {
+  local commands_file="$ROOT/COMMANDS.md"
+  require_file "$commands_file"
+  cat "$commands_file"
+}
+
+cmd_help() {
+  echo "Usage: bin/project <command>"
+  echo ""
+  echo "Commands:"
+  echo "  status     Show version, last changelog entry, unreleased changes"
+  echo "  commands   Display the full command reference (COMMANDS.md)"
+  echo "  help       Show this usage information"
+}
+
+# ── Dispatch ──────────────────────────────────────────────────────────────────
+
+case "${1:-}" in
+  status)   cmd_status   ;;
+  commands) cmd_commands  ;;
+  help)     cmd_help      ;;
+  "")
+    cmd_help
+    exit 1
+    ;;
+  *)
+    echo "Error: unknown command '$1'" >&2
+    echo "" >&2
+    cmd_help >&2
+    exit 1
+    ;;
+esac

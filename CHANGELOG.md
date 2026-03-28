@@ -10,6 +10,14 @@ Format: [Semantic Versioning](https://semver.org/). Dates are YYYY-MM-DD.
 
 ---
 
+## [0.4.0] — 2026-03-28
+
+### Added
+- `bin/project` CLI — run read-only project commands (`status`, `commands`) directly from the terminal without consuming AI agent tokens. Documented in `COMMANDS.md`, `tooling/agent-instructions.md`, and all generated adapter files.
+- `docs/` directory — dedicated location for project documentation that grows with the project. Referenced in key files tables, `README.md`, `README.template.md`, `setup.sh`, and all agent adapter files.
+
+---
+
 ## [0.3.1] — 2026-03-28
 
 ### Fixed

@@ -30,6 +30,18 @@ Commands are natural language trigger phrases recognised by any AI tool working 
 
 ---
 
+## CLI
+
+Read-only commands can be run directly from the terminal without an AI agent:
+
+```
+bin/project status     # version, last release, unreleased changes
+bin/project commands   # display this reference
+bin/project help       # usage information
+```
+
+---
+
 ## Adding commands
 
 Add a `## Commands` table to any skill file in `skills/`. Run `bash skills/sync.sh` to register them here and in all tool adapter files.

@@ -73,6 +73,17 @@ for FILE in "${FILES[@]}"; do
   fi
 done
 
+# ── Create docs directory ──────────────────────────────────────────────────────
+
+mkdir -p docs
+cat > docs/README.md << 'DOCS_README'
+# Documentation
+
+This directory is yours. The scaffold has no opinion on how you organise it or what you put in it — structure it however makes sense for your project.
+
+For AI tool instructions and command references, see [`tooling/`](../tooling/).
+DOCS_README
+
 # ── Swap READMEs: project README replaces the scaffold README ─────────────────
 
 mv README.template.md README.md
@@ -115,6 +126,8 @@ echo "  CONTRIBUTING.md                  ← versioning rules, ready to use"
 echo "  CHANGELOG.md                     ← change history, ready to use"
 echo "  VERSION                          ← 0.1.0"
 echo "  LICENSE                          ← MIT, ${YEAR}, ${AUTHOR}"
+echo "  docs/                            ← project documentation (grows with the project)"
+echo "  bin/project                      ← CLI for read-only commands (no agent needed)"
 echo ""
 echo "AI tooling:"
 echo "  CLAUDE.md                        ← Claude Code (auto-loaded at session start)"

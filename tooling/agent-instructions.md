@@ -45,6 +45,8 @@ Report the following without taking any other action:
 
 Read `COMMANDS.md` and display its full contents. Do not take any other action.
 
+> **CLI alternative:** `bin/project status` and `bin/project commands` provide the same output directly from the terminal without using agent tokens.
+
 ### Never
 
 - Never make a change without updating `CHANGELOG.md`
@@ -64,6 +66,7 @@ Read `COMMANDS.md` and display its full contents. Do not take any other action.
 | `CONTRIBUTING.md` | SemVer rules and the full release process |
 | `VERSION` | Canonical version number for the repo |
 | `COMMANDS.md` | All available commands and trigger phrases, grouped by namespace |
+| `docs/` | Project documentation — grows with the project |
 
 ---
 
