@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 382" width="680">
+  <style>
+    text { font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; }
+    .hdr { font-size: 11px; fill: #888780; }
+    .t   { font-size: 14px; font-weight: 500; }
+    .s   { font-size: 12px; }
+    .arr { stroke: #D1D5DB; stroke-width: 1.5; fill: none; }
+    .dash { stroke: #D1D5DB; stroke-width: 1.5; stroke-dasharray: 4 4; fill: none; }
+    .teal-box  { fill: #E1F5EE; stroke: #0F6E56; stroke-width: 0.5; }
+    .teal-t    { fill: #085041; }
+    .teal-s    { fill: #1D9E75; }
+    .amber-box { fill: #FAEEDA; stroke: #854F0B; stroke-width: 0.5; }
+    .amber-t   { fill: #633806; }
+    .amber-s   { fill: #BA7517; }
+    .gray-box  { fill: #F1EFE8; stroke: #888780; stroke-width: 0.5; }
+    .gray-t    { fill: #444441; }
+    .gray-s    { fill: #888780; }
+  </style>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- Column headers -->
+  <text class="hdr" x="115" y="24" text-anchor="middle">Source files</text>
+  <text class="hdr" x="340" y="24" text-anchor="middle">Generator</text>
+  <text class="hdr" x="535" y="24" text-anchor="middle">Output files</text>
+
+  <!-- Source: skills/*.md -->
+  <rect class="teal-box" x="30" y="40" width="170" height="56" rx="8"/>
+  <text class="t teal-t" x="115" y="60" text-anchor="middle" dominant-baseline="central">skills/*.md</text>
+  <text class="s teal-s" x="115" y="82" text-anchor="middle" dominant-baseline="central">definitions + commands</text>
+
+  <!-- Source: project.md -->
+  <rect class="teal-box" x="30" y="158" width="170" height="56" rx="8"/>
+  <text class="t teal-t" x="115" y="178" text-anchor="middle" dominant-baseline="central">project.md</text>
+  <text class="s teal-s" x="115" y="200" text-anchor="middle" dominant-baseline="central">project context</text>
+
+  <!-- Arrows: sources → sync.sh -->
+  <line x1="200" y1="68" x2="253" y2="68" class="arr" marker-end="url(#arr)"/>
+  <line x1="200" y1="186" x2="253" y2="186" class="arr" marker-end="url(#arr)"/>
+
+  <!-- Generator: sync.sh -->
+  <rect class="amber-box" x="255" y="40" width="170" height="224" rx="8"/>
+  <text class="t amber-t" x="340" y="148" text-anchor="middle" dominant-baseline="central">sync.sh</text>
+  <text class="s amber-s" x="340" y="170" text-anchor="middle" dominant-baseline="central">run when skills change</text>
+
+  <!-- Arrows: sync.sh → outputs -->
+  <line x1="425" y1="68"  x2="438" y2="68"  class="arr" marker-end="url(#arr)"/>
+  <line x1="425" y1="140" x2="438" y2="140" class="arr" marker-end="url(#arr)"/>
+  <line x1="425" y1="212" x2="438" y2="212" class="arr" marker-end="url(#arr)"/>
+
+  <!-- Output: CLAUDE.md -->
+  <rect class="gray-box" x="440" y="40" width="210" height="56" rx="8"/>
+  <text class="t gray-t" x="545" y="60" text-anchor="middle" dominant-baseline="central">CLAUDE.md</text>
+  <text class="s gray-s" x="545" y="82" text-anchor="middle" dominant-baseline="central">generated — never edit</text>
+
+  <!-- Output: .cursorrules -->
+  <rect class="gray-box" x="440" y="112" width="210" height="56" rx="8"/>
+  <text class="t gray-t" x="545" y="132" text-anchor="middle" dominant-baseline="central">.cursorrules</text>
+  <text class="s gray-s" x="545" y="154" text-anchor="middle" dominant-baseline="central">generated — never edit</text>
+
+  <!-- Output: copilot-instructions.md -->
+  <rect class="gray-box" x="440" y="184" width="210" height="56" rx="8"/>
+  <text class="t gray-t" x="545" y="204" text-anchor="middle" dominant-baseline="central">copilot-instructions.md</text>
+  <text class="s gray-s" x="545" y="226" text-anchor="middle" dominant-baseline="central">generated — never edit</text>
+
+  <!-- Dashed arrow: setup.sh → sync.sh -->
+  <line x1="340" y1="302" x2="340" y2="266" class="dash" marker-end="url(#arr)"/>
+
+  <!-- setup.sh box -->
+  <rect class="gray-box" x="255" y="304" width="170" height="44" rx="8"/>
+  <text class="t gray-t" x="340" y="326" text-anchor="middle" dominant-baseline="central">setup.sh</text>
+
+  <!-- Label -->
+  <text class="s gray-s" x="340" y="364" text-anchor="middle">calls sync.sh once at project init</text>
+</svg>

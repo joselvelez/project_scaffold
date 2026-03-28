@@ -6,24 +6,20 @@ This document defines how {{PROJECT_NAME}} is versioned, released, and maintaine
 
 ## Versioning
 
-{{PROJECT_NAME}} uses Semantic Versioning (`MAJOR.MINOR.PATCH`).
-
-### When to bump
+{{PROJECT_NAME}} uses Semantic Versioning (`MAJOR.MINOR.PATCH`). All projects start at `0.1.0`.
 
 | Change | Bump | Example |
-|---|---|---|
+| --- | --- | --- |
 | Bug fix, typo, small correction | PATCH | `0.1.1` → `0.1.2` |
 | New feature or section, nothing breaks | MINOR | `0.1.2` → `0.2.0` |
 | Breaking architectural change | MAJOR | `0.2.0` → `1.0.0` |
 
-New projects start at `0.1.0`.
-
 ### Where the version lives
 
-The version must be identical in every location it appears. Updating one means updating all.
+The version must be identical in every location it appears.
 
 | Location | Notes |
-|---|---|
+| --- | --- |
 | `VERSION` | Repo root. Canonical source of truth. Always present. |
 | `{{PROJECT_NAME}}.md` header | Always matches `VERSION`. |
 | `CHANGELOG.md` | Every release entry carries the version. |
@@ -33,29 +29,65 @@ The version must be identical in every location it appears. Updating one means u
 
 ---
 
-## Release Process
+## Push commands
 
-When a change is complete, follow these steps in order. Do not skip steps.
+Use one of these commands in your AI tool when you are ready to commit and push. Never use bare "push" — it will not be accepted without a qualifier.
 
-**1. Bump the version** in all locations listed above.
+| Command | Bump | Version change |
+| --- | --- | --- |
+| `push:breaking` | Major | `0.1.0 → 1.0.0` |
+| `push:new` | Minor | `0.1.0 → 0.2.0` |
+| `push:fix` | Patch | `0.1.0 → 0.1.1` |
 
-**2. Update `CHANGELOG.md`** — move staged changes from `[Unreleased]` into a new versioned entry with today's date.
-
-**3. Tag the release:**
-
-```
-git tag -a vX.Y.Z -m "Release vX.Y.Z — <one line summary>"
-git push origin vX.Y.Z
-```
-
-**4. Create a GitHub Release** using that tag. Use the `CHANGELOG.md` entry for that version as the release notes.
+Not sure which one to use? The decision tree below walks you through it.
 
 ---
 
-## Reminders
+## Which command do I use?
 
-These rules apply in every session, without exception.
+![Semver decision tree](assets/semver-decision-tree.svg)
 
-- If the words **"ship it"**, **"done"**, **"merge this"**, or **"push this"** appear — stop and confirm the full release checklist has been completed before proceeding.
-- Whenever a file is edited that changes the version, always show the exact `git tag` command to run next.
-- Never skip a version bump silently. Always state what the new version should be and why.
+Read it top to bottom. Answer each question. The first **Yes** determines your command.
+
+---
+
+## Release process
+
+When you issue a push command, the AI tool executes these steps in order.
+
+1. **States the version** — announces current and new version before touching anything.
+2. **Waits for confirmation** — does not modify any file until you confirm.
+3. **Bumps the version** in all required locations simultaneously.
+4. **Updates `CHANGELOG.md`** — moves `[Unreleased]` entries into a new versioned section with today's date.
+5. **Provides the tag command:**
+   ```
+   git tag -a vX.Y.Z -m "Release vX.Y.Z — <one line summary>"
+   git push origin vX.Y.Z
+   ```
+6. **Reminds** to create a GitHub Release from that tag using the `CHANGELOG.md` entry as release notes.
+
+---
+
+## Skill commands
+
+Skills are specialised behavioral modules in `skills/`. Each skill defines a focused identity and rules for a specific type of work. Invoke them explicitly with their commands — there are no automatic triggers.
+
+| Command | What it does |
+| --- | --- |
+| `scribe:document` | Write documentation for a new component, module, or feature |
+| `scribe:update` | Update existing documentation in-place |
+| `scribe:review` | Review documentation for accuracy and completeness |
+
+---
+
+## Updating AI tool files
+
+`CLAUDE.md`, `.cursorrules`, and `.github/copilot-instructions.md` are generated files. Never edit them directly.
+
+To update them — after adding a skill or editing `project.md`:
+
+```
+bash skills/sync.sh
+```
+
+Commit the regenerated files along with the change that prompted the sync.
