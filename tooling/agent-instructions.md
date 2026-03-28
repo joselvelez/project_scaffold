@@ -70,6 +70,21 @@ For the full list of skill commands and trigger phrases, see `COMMANDS.md` or ru
 
 ---
 
+## Prompt Macros
+
+Prompt macros are shorthand triggers that expand into predefined text. When a user's message ends with a prompt macro trigger (e.g. `/doublecheck`), treat the message as if the full expansion text was appended to it.
+
+**Rules:**
+- The trigger must appear at the end of the user's message
+- Append the expansion text to the user's original message — do not replace it
+- Follow every instruction in the expanded text for the duration of that response
+
+Prompt macros are defined in `prompts/`. Each file contains a `# /trigger` heading followed by the expansion text. Run `bash skills/sync.sh` after adding or changing a prompt macro.
+
+For the full list of prompt macros and their expansion text, see `COMMANDS.md`.
+
+---
+
 ## Project Context
 
 **{{PROJECT_NAME}}:** {{PROJECT_DESCRIPTION}}

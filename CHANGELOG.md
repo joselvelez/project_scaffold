@@ -10,6 +10,22 @@ Format: [Semantic Versioning](https://semver.org/). Dates are YYYY-MM-DD.
 
 ---
 
+## [0.5.0] — 2026-03-28
+
+### Added
+- `prompts/` directory — prompt macro system for shorthand triggers that expand into predefined text appended to user messages
+- `prompts/doublecheck.md` — `/doublecheck` macro for code review and verification workflow
+- `prompts/proceed.md` — `/proceed` macro for systematic implementation workflow
+- Prompt macros section in `skills/sync.sh` — reads `prompts/*.md`, generates expansion text into all agent adapter files
+- Prompt macros section in `COMMANDS.md` — trigger summary table and full expansion text reference
+- Prompt macros section in `tooling/agent-instructions.md` — behavior rules for how agents handle prompt macro triggers
+
+### Changed
+- `skills/sync.sh` — extended to read `prompts/*.md` and inject prompt macros into generated files (`tooling/claude.md`, `COMMANDS.md`, `.cursor/rules/agent.mdc`, `.github/copilot-instructions.md`)
+- `tooling/README.md` — added `prompts/*.md` to source files list and architecture diagram
+
+---
+
 ## [0.4.1] — 2026-03-28
 
 ### Changed
