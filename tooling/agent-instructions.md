@@ -25,14 +25,13 @@ Stop. Do not proceed until the following checklist is confirmed:
 - `CHANGELOG.md` updated — `[Unreleased]` section has an entry for this change
 - Git tag command prepared and ready to run
 
-Always provide the exact tag command:
+Always provide the exact three-command release sequence. Extract the release notes from the versioned entry just written to `CHANGELOG.md` and populate them inline — do not leave placeholders:
 
 ```
 git tag -a vX.Y.Z -m "Release vX.Y.Z — <one line summary>"
 git push origin vX.Y.Z
+gh release create vX.Y.Z --title "vX.Y.Z — <one line summary>" --notes "<changelog entry for this version>"
 ```
-
-Then remind to create a GitHub Release from that tag using the `CHANGELOG.md` entry as release notes.
 
 ### On `project:status`
 

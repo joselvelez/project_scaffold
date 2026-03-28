@@ -10,6 +10,13 @@ Format: [Semantic Versioning](https://semver.org/). Dates are YYYY-MM-DD.
 
 ---
 
+## [0.3.1] — 2026-03-28
+
+### Fixed
+- Release instructions across all agent files — replaced two-step "tag + remind to create GitHub Release" with a single three-command sequence (`git tag`, `git push origin`, `gh release create`). Affected files: `.cursor/rules/agent.mdc`, `.github/copilot-instructions.md`, `skills/sync.sh`, `tooling/agent-instructions.md`, `tooling/claude.md`.
+
+---
+
 ## [0.3.0] — 2026-03-28
 
 ### Added

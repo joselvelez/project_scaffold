@@ -34,12 +34,12 @@ When a push command is detected:
 2. Wait for explicit confirmation before changing any file.
 3. Bump the version in all required locations: `VERSION`, `{{PROJECT_NAME}}.md` header, `package.json` (if it exists).
 4. Update `CHANGELOG.md` — move `[Unreleased]` into a new versioned section with today's date.
-5. Provide the exact tag command:
+5. Provide the exact three-command release sequence. Extract the release notes from the versioned entry just written to `CHANGELOG.md` and populate them inline — do not leave placeholders:
    ```
    git tag -a vX.Y.Z -m "Release vX.Y.Z — <one line summary>"
    git push origin vX.Y.Z
+   gh release create vX.Y.Z --title "vX.Y.Z — <one line summary>" --notes "<changelog entry for this version>"
    ```
-6. Remind to create a GitHub Release from that tag using the `CHANGELOG.md` entry as release notes.
 
 If "push" appears without a qualifier, respond: "Which type — `push:breaking`, `push:new`, or `push:fix`?
 See `CONTRIBUTING.md` for the decision tree." Do not proceed without a qualified command.
