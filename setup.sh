@@ -8,8 +8,10 @@ echo "======================"
 echo ""
 
 # ── Collect project info ──────────────────────────────────────────────────────
+
 # Note: PROJECT_NAME must not contain spaces, forward slashes, or pipe characters.
 # Spaces break markdown links; slashes and pipes break sed replacements.
+
 read -p "Project name (e.g. EAGLE, Nexus, Atlas): " PROJECT_NAME
 
 if [ -z "$PROJECT_NAME" ]; then
@@ -33,26 +35,28 @@ DATE=$(date +%Y-%m-%d)
 YEAR=$(date +%Y)
 
 # ── Validate PROJECT.md exists ────────────────────────────────────────────────
+
 if [ ! -f "PROJECT.md" ]; then
   echo "Error: PROJECT.md not found. Run this script from the repo root."
   exit 1
 fi
 
 # ── Rename PROJECT.md ─────────────────────────────────────────────────────────
+
 mv PROJECT.md "${PROJECT_NAME}.md"
 
 # ── Replace placeholders in all templated files ───────────────────────────────
-# skills/sync.sh is included here so its embedded heredoc has the correct
-# project name before it runs and generates CLAUDE.md.
+
 FILES=(
   "${PROJECT_NAME}.md"
+  "CLAUDE.md"
   "CONTRIBUTING.md"
   "CHANGELOG.md"
+  "COMMANDS.md"
   "README.template.md"
   "LICENSE"
-  "project.md"
   "skills/scribe.md"
-  "skills/sync.sh"
+  "tooling/agent-instructions.md"
 )
 
 for FILE in "${FILES[@]}"; do
@@ -70,39 +74,57 @@ for FILE in "${FILES[@]}"; do
 done
 
 # ── Swap READMEs: project README replaces the scaffold README ─────────────────
+
 mv README.template.md README.md
 
 # ── JS/TS: remove package.json row from CONTRIBUTING.md if not applicable ─────
+
 if [ "$PROJECT_TYPE_INPUT" != "1" ]; then
   sed -i.bak '/package.json/d' CONTRIBUTING.md && rm -f CONTRIBUTING.md.bak
 fi
 
-# ── Generate AI tool files ────────────────────────────────────────────────────
-# sync.sh reads skills/*.md and project.md to produce CLAUDE.md, .cursorrules,
-# and .github/copilot-instructions.md. Never edit those files directly.
-chmod +x skills/sync.sh
-bash skills/sync.sh
+# ── Generate tool-specific adapter files ─────────────────────────────────────
+
+# GitHub Copilot — requires a self-contained file at .github/copilot-instructions.md
+# (Copilot does not support file imports)
+{
+  cat tooling/agent-instructions.md
+  printf '\n\n---\n\n'
+  cat COMMANDS.md
+} > .github/copilot-instructions.md
+
+# Cursor — requires a .mdc file with frontmatter at .cursor/rules/
+# (alwaysApply: true loads the rules for every session in this project)
+mkdir -p .cursor/rules
+{
+  printf -- '---\ndescription: Project agent instructions and command reference\nalwaysApply: true\n---\n\n'
+  cat tooling/agent-instructions.md
+  printf '\n\n---\n\n'
+  cat COMMANDS.md
+} > .cursor/rules/agent.mdc
 
 # ── Summary ───────────────────────────────────────────────────────────────────
+
 echo "Done. ${PROJECT_NAME} is ready."
 echo ""
 echo "Files:"
-echo "  README.md               ← your project README"
-echo "  ${PROJECT_NAME}.md      ← fill in your system design"
-echo "  project.md              ← add project context for AI tools"
-echo "  CONTRIBUTING.md         ← versioning rules and push commands"
-echo "  CHANGELOG.md            ← change history, ready to use"
-echo "  VERSION                 ← 0.1.0"
-echo "  LICENSE                 ← MIT, ${YEAR}, ${AUTHOR}"
+echo "  README.md                        ← your project README"
+echo "  ${PROJECT_NAME}.md               ← fill in your system design"
+echo "  COMMANDS.md                      ← command reference, ready to use"
+echo "  CONTRIBUTING.md                  ← versioning rules, ready to use"
+echo "  CHANGELOG.md                     ← change history, ready to use"
+echo "  VERSION                          ← 0.1.0"
+echo "  LICENSE                          ← MIT, ${YEAR}, ${AUTHOR}"
 echo ""
-echo "Generated (never edit directly — run bash skills/sync.sh to update):"
-echo "  CLAUDE.md"
-echo "  .cursorrules"
-echo "  .github/copilot-instructions.md"
+echo "AI tooling:"
+echo "  CLAUDE.md                        ← Claude Code (auto-loaded at session start)"
+echo "  .github/copilot-instructions.md  ← GitHub Copilot (auto-loaded)"
+echo "  .cursor/rules/agent.mdc          ← Cursor (alwaysApply: true)"
+echo "  tooling/agent-instructions.md    ← source of truth — edit this, not the adapters"
 echo ""
 echo "Next steps:"
 echo "  1. Fill in ${PROJECT_NAME}.md with your system design"
-echo "  2. Add project context to project.md, then run: bash skills/sync.sh"
+echo "  2. Add project context to the bottom of tooling/agent-instructions.md"
 if [ "$PROJECT_TYPE_INPUT" = "1" ]; then
   echo "  3. Set \"version\": \"0.1.0\" in your package.json"
 fi
@@ -119,4 +141,5 @@ echo "    git push -u origin main"
 echo ""
 
 # ── Self-cleanup ──────────────────────────────────────────────────────────────
+
 rm -- "$0"
