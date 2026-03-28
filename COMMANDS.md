@@ -7,12 +7,10 @@ Commands are natural language trigger phrases recognised by any AI tool working 
 
 ---
 
-## project: — Project
+## push: — Release
 
 | Command | What it does |
 | --- | --- |
-| `project:commands` | Display this reference |
-| `project:status` | Show current version, last changelog entry, and any unreleased changes |
 | `push:fix` | Patch version bump + release checklist |
 | `push:new` | Minor version bump + release checklist |
 | `push:breaking` | Major version bump + release checklist |

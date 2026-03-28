@@ -33,20 +33,6 @@ git push origin vX.Y.Z
 gh release create vX.Y.Z --title "vX.Y.Z — <one line summary>" --notes "<changelog entry for this version>"
 ```
 
-### On `project:status`
-
-Report the following without taking any other action:
-
-1. Current version — read from `VERSION`
-2. Last versioned entry in `CHANGELOG.md` — version number, date, and summary
-3. Contents of the `[Unreleased]` section of `CHANGELOG.md`, if any exist
-
-### On `project:commands`
-
-Read `COMMANDS.md` and display its full contents. Do not take any other action.
-
-> **CLI alternative:** `bin/project status` and `bin/project commands` provide the same output directly from the terminal without using agent tokens.
-
 ### Never
 
 - Never make a change without updating `CHANGELOG.md`
@@ -80,7 +66,7 @@ Skills are specialised behavioural modules that extend what an AI tool can do wi
 |---|---|---|
 | **Scribe** | `skills/scribe.md` | Any documentation needs to be created or maintained |
 
-For the full list of skill commands and trigger phrases, run `project:commands`.
+For the full list of skill commands and trigger phrases, see `COMMANDS.md` or run `bin/project commands` from the terminal.
 
 ---
 

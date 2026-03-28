@@ -129,19 +129,6 @@ See `CONTRIBUTING.md` for the decision tree." Do not proceed without a qualified
 
 ---
 
-## Project commands
-
-| Command | What it does |
-| --- | --- |
-| `project:commands` | Display COMMANDS.md — all available commands grouped by namespace |
-| `project:status` | Report current version, last changelog entry, and any unreleased changes |
-
-When `project:commands` is detected: read `COMMANDS.md` and display its full contents. Take no other action.
-
-When `project:status` is detected: read `VERSION`, the last versioned entry in `CHANGELOG.md`, and the `[Unreleased]` section if it exists. Report all three. Take no other action.
-
----
-
 ## Skill commands
 
 STATIC_HEADER
@@ -205,12 +192,10 @@ Commands are natural language trigger phrases recognised by any AI tool working 
 
 ---
 
-## project: — Project
+## push: — Release
 
 | Command | What it does |
 | --- | --- |
-| `project:commands` | Display this reference |
-| `project:status` | Show current version, last changelog entry, and any unreleased changes |
 | `push:fix` | Patch version bump + release checklist |
 | `push:new` | Minor version bump + release checklist |
 | `push:breaking` | Major version bump + release checklist |

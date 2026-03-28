@@ -10,6 +10,17 @@ Format: [Semantic Versioning](https://semver.org/). Dates are YYYY-MM-DD.
 
 ---
 
+## [0.4.1] — 2026-03-28
+
+### Changed
+- Removed `project:commands` and `project:status` as AI chat commands — these are now CLI-only via `bin/project`
+- Added "Two command systems" section to `README.md` distinguishing AI chat commands (`push:*`, `scribe:*`) from terminal CLI commands (`bin/project`)
+- Renamed `COMMANDS.md` "project:" section to "push: — Release" (only push commands remain as AI chat commands)
+- Removed `project:commands` and `project:status` handler blocks from `tooling/agent-instructions.md`
+- Regenerated all tool adapter files (`tooling/claude.md`, `.cursor/rules/agent.mdc`, `.github/copilot-instructions.md`, `COMMANDS.md`)
+
+---
+
 ## [0.4.0] — 2026-03-28
 
 ### Added

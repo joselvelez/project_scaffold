@@ -53,6 +53,19 @@ your-project/
 
 ---
 
+## Two command systems
+
+This scaffold has two distinct command systems. They serve different purposes and run in different places.
+
+| System | Where you type it | What it does |
+| --- | --- | --- |
+| **AI chat commands** (`push:*`, `scribe:*`) | Editor AI chat (Claude, Copilot, Cursor) | Instruct the AI tool to perform a structured task |
+| **CLI commands** (`bin/project`) | Terminal | Read-only project status — no AI tokens required |
+
+AI chat commands are natural language triggers recognised by the AI tool. CLI commands are shell scripts you run directly.
+
+---
+
 ## How the system works
 
 ### One version number, everywhere
@@ -89,9 +102,9 @@ bash skills/sync.sh
 
 **During setup**, `setup.sh` calls `sync.sh` automatically. You never need to think about it for initial configuration.
 
-### Push commands — the only way to release
+### Push commands — AI chat, the only way to release
 
-Instead of asking the AI tool to figure out the version bump, you tell it directly with a typed command. There is no ambiguity and no interview.
+Instead of asking the AI tool to figure out the version bump, you tell it directly with a typed command in your editor's AI chat. There is no ambiguity and no interview.
 
 | Command | Bump | What it means |
 | --- | --- | --- |
@@ -105,9 +118,9 @@ When you issue a push command, the AI tool states the version change, waits for 
 
 ![Semver decision tree](assets/semver-decision-tree.svg)
 
-### Skill commands — explicit invocation only
+### Skill commands — AI chat, explicit invocation only
 
-Skills are specialised behavioral modules in `skills/`. Each skill defines a focused identity, rules, and output standards for a specific type of work. They are invoked with explicit commands — there are no automatic triggers, no judgment calls.
+Skills are specialised behavioral modules in `skills/`. Each skill defines a focused identity, rules, and output standards for a specific type of work. They are invoked with explicit commands in your editor's AI chat — there are no automatic triggers, no judgment calls.
 
 | Command | Skill | What it does |
 | --- | --- | --- |
@@ -118,6 +131,20 @@ Skills are specialised behavioral modules in `skills/`. Each skill defines a foc
 When you type a skill command in your editor's AI chat, the tool reads the corresponding `skills/*.md` file and operates under its rules for that task. When the task is done, normal behaviour resumes.
 
 **Adding a new skill:** create a `skills/your-skill.md` file with a `## Commands` section, then run `bash skills/sync.sh`. The new commands appear in `CLAUDE.md` automatically — no manual routing required.
+
+### CLI commands — terminal, no agent required
+
+Read-only commands are available directly from the terminal via `bin/project`. These cost zero AI tokens and require no agent session. They are not AI chat commands — they are shell scripts.
+
+```
+bin/project status     # current version, unreleased changes, last release
+bin/project commands   # display the full command reference (COMMANDS.md)
+bin/project help       # usage information
+```
+
+Run from the repository root. The script reads `VERSION`, `CHANGELOG.md`, and `COMMANDS.md` to produce its output.
+
+For the complete command reference — including AI chat commands and CLI commands — see `COMMANDS.md` or run `bin/project commands`.
 
 ---
 
