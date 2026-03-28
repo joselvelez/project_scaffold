@@ -10,6 +10,14 @@ Format: [Semantic Versioning](https://semver.org/). Dates are YYYY-MM-DD.
 
 ---
 
+## [0.6.0] — 2026-03-28
+
+### Changed
+- Push command instructions in `tooling/agent-instructions.md` and `skills/sync.sh` — changed from "provide the commands" to explicitly "execute the full release sequence yourself via the terminal." Agents must run git commit, tag, push, and gh release commands directly — not display them for the user to run. Full 5-step release sequence now explicitly documented.
+- Regenerated all tool adapter files (`tooling/claude.md`, `.cursor/rules/agent.mdc`, `.github/copilot-instructions.md`, `COMMANDS.md`)
+
+---
+
 ## [0.5.0] — 2026-03-28
 
 ### Added

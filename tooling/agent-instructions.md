@@ -17,21 +17,23 @@ These rules apply to every session and every change without exception. They are 
    - `package.json` if this is a JS/TS project and the file exists
 3. Add an entry to the `[Unreleased]` section of `CHANGELOG.md` describing what changed and why. Never leave a change undocumented.
 
-### On `project:release` (aliases: `push` · `ship it` · `done` · `merge this`)
+### On `push:fix`, `push:new`, or `push:breaking`
 
 Stop. Do not proceed until the following checklist is confirmed:
 
 - Version bumped in all required locations
-- `CHANGELOG.md` updated — `[Unreleased]` section has an entry for this change
-- Git tag command prepared and ready to run
+- `CHANGELOG.md` updated — `[Unreleased]` moved into a new versioned section with today's date
+- All changes committed
 
-Always provide the exact three-command release sequence. Extract the release notes from the versioned entry just written to `CHANGELOG.md` and populate them inline — do not leave placeholders:
+**You MUST execute the full release sequence yourself — do not just display the commands.** Run each command via the terminal. The sequence is:
 
-```
-git tag -a vX.Y.Z -m "Release vX.Y.Z — <one line summary>"
-git push origin vX.Y.Z
-gh release create vX.Y.Z --title "vX.Y.Z — <one line summary>" --notes "<changelog entry for this version>"
-```
+1. `git add -A && git commit -m "<detailed commit message>"`
+2. `git tag -a vX.Y.Z -m "Release vX.Y.Z — <one line summary>"`
+3. `git push origin main`
+4. `git push origin vX.Y.Z`
+5. `gh release create vX.Y.Z --title "vX.Y.Z — <one line summary>" --notes "<changelog entry for this version>"`
+
+Extract the release notes from the versioned entry just written to `CHANGELOG.md` and populate them inline — do not leave placeholders. Do not skip any step. Do not present commands for the user to run — execute them.
 
 ### Never
 
