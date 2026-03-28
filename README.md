@@ -100,7 +100,7 @@ flowchart TD
    bash setup.sh
    ```
 5. Answer five prompts: project name, one-line description, platform, author name, and whether it's a JS/TS project
-6. Fill in `YourProject.md` with your system design and add project context to the bottom of `CLAUDE.md`
+6. Fill in `YourProject.md` with your system design — start with `## Key Constraints` before your first AI-assisted session. `CLAUDE.md` requires no manual editing.
 
 ### Option 2 — Clone and reset
 

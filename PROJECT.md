@@ -5,7 +5,7 @@
 
 | | |
 |---|---|
-| **Version** | 0.1.0 |
+| **Version** | 0.1.1 |
 | **Date** | {{DATE}} |
 | **Status** | Design |
 
@@ -22,6 +22,20 @@ All additions and modifications to this document must follow these rules without
 - **Code** — Included only when a concept cannot be expressed without it. Never paste implementation code. Configuration snippets are acceptable only when they are the clearest way to express a constraint.
 - **Visuals** — Every architectural concept, structural relationship, data flow, or system responsibility must be accompanied by a diagram or table. Mermaid is the preferred diagram format for compatibility across platforms. Do not describe a relationship in prose when a diagram expresses it more clearly.
 - **Scope** — This document describes {{PROJECT_NAME}} only. External systems are referenced only as they relate to {{PROJECT_NAME}}.
+
+---
+
+## Key Constraints
+
+<!-- 3–5 bullets. Non-negotiable rules that must never be reversed.
+     Written for an AI agent that hasn't read the rest of this document.
+     Fill this in before your first AI-assisted session.
+
+     Examples:
+     - All background jobs must use BullMQ — never inline async work.
+     - The VERSION file is the canonical version number — all other locations are mirrors.
+     - Never modify the changelog structure — entries go in [Unreleased] only.
+-->
 
 ---
 

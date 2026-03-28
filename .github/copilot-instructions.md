@@ -74,4 +74,6 @@ Skills are specialised behavioral modules that extend what an AI tool can do wit
 **{{PROJECT_NAME}}:** {{PROJECT_DESCRIPTION}}  
 **Platform:** {{PROJECT_PLATFORM}}
 
-[After running setup.sh, add further context here — what the system does, key constraints, important design decisions that should not be reversed, and anything an AI tool should know before making changes. This section is what lets a tool work sensibly without reading the full system document first.]
+For non-negotiable constraints and critical design decisions, read the `## Key Constraints`
+section of `{{PROJECT_NAME}}.md` before making any changes. That section is maintained
+alongside the system design and is the authoritative quick-reference for AI tools.
