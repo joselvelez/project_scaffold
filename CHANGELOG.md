@@ -10,6 +10,13 @@ Format: [Semantic Versioning](https://semver.org/). Dates are YYYY-MM-DD.
 
 ---
 
+## [0.2.1] — 2026-03-28
+
+### Fixed
+- `README.md` — fixed Mermaid code block syntax (added `mermaid` language identifier) and corrected newline syntax in diagram node labels (`\n` → `<br/>`). Diagrams now render correctly on GitHub.
+
+---
+
 ## [0.2.0] — 2026-03-28
 
 ### Added

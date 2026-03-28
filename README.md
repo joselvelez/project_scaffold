@@ -55,13 +55,13 @@ your-project/
 
 `VERSION` is the single source of truth. Every other location where the version appears is a mirror of it. When anything changes, all mirrors update together — never just one.
 
-```
+```mermaid
 flowchart LR
-    V["VERSION\n― canonical ―"]
-    V --> PM["YourProject.md\nheader"]
-    V --> CL["CHANGELOG.md\nrelease entries"]
-    V --> PJ["package.json\nJS / TS projects"]
-    V --> GT["git tag\nvX.Y.Z"]
+    V["VERSION<br/>― canonical ―"]
+    V --> PM["YourProject.md<br/>header"]
+    V --> CL["CHANGELOG.md<br/>release entries"]
+    V --> PJ["package.json<br/>JS / TS projects"]
+    V --> GT["git tag<br/>vX.Y.Z"]
     GT --> GR["GitHub Release"]
 ```
 
@@ -150,16 +150,16 @@ git push -u origin main
 
 ### What setup.sh does
 
-```
+```mermaid
 flowchart TD
     S["bash setup.sh"]
-    S --> Q["Five prompts:\nname · description · platform · author · JS or not"]
-    Q --> RN["Renames PROJECT.md\nto YourProject.md"]
-    Q --> RP["Replaces all placeholders\nin every file"]
-    Q --> RS["Swaps README.template.md\nto README.md"]
-    Q --> JS["Removes package.json row\nif not a JS/TS project"]
-    Q --> SY["Runs skills/sync.sh\ngenerates AI tool files"]
-    Q --> SD["Deletes itself —\nsetup.sh is gone"]
+    S --> Q["Five prompts:<br/>name · description · platform · author · JS or not"]
+    Q --> RN["Renames PROJECT.md<br/>to YourProject.md"]
+    Q --> RP["Replaces all placeholders<br/>in every file"]
+    Q --> RS["Swaps README.template.md<br/>to README.md"]
+    Q --> JS["Removes package.json row<br/>if not a JS/TS project"]
+    Q --> SY["Runs skills/sync.sh<br/>generates AI tool files"]
+    Q --> SD["Deletes itself —<br/>setup.sh is gone"]
     RN & RP & RS & JS & SY & SD --> D["Project is ready"]
 ```
 
