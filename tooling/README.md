@@ -4,39 +4,48 @@ This directory contains AI tool adapter files — the tool-specific configuratio
 
 **The project rules are not defined here.** They live in:
 
-- `tooling/agent-instructions.md` — the source of truth for agent behaviour: versioning rules, changelog discipline, skills protocol, command handling
-- `COMMANDS.md` — the canonical command registry
+- `tooling/agent-instructions.md` — edit this to change agent behaviour project-wide
+- `project.md` — edit this to update project-specific context
+- `skills/*.md` — edit these to add or change skill commands
 
-Tool adapters are thin. They load the project rules and add only what a specific tool requires — file naming conventions, include syntax, frontmatter, or output format. No project logic lives in an adapter.
+Never edit the generated files directly. Run `bash skills/sync.sh` instead.
 
 ---
 
-## Adapters in this directory
+## How it works
 
-| File | Tool | How it reaches the tool |
+```
+tooling/agent-instructions.md   ← you edit this
+project.md                      ← you edit this
+skills/*.md                     ← you edit these
+         │
+         └── bash skills/sync.sh
+                    │
+                    ├── tooling/claude.md                (generated)
+                    ├── COMMANDS.md                      (generated)
+                    ├── CLAUDE.md                        (generated, thin pointer)
+                    ├── .cursor/rules/agent.mdc          (generated)
+                    └── .github/copilot-instructions.md  (generated)
+```
+
+`sync.sh` reads `agent-instructions.md`, aggregates `## Commands` tables from every file in `skills/`, appends `project.md` context, and writes the result to each tool's required location and format.
+
+---
+
+## Generated files
+
+| File | Tool | Notes |
 |---|---|---|
-| `agent-instructions.md` | All tools | Referenced by all adapters. Edit this to change agent behaviour project-wide. |
-| _(generated)_ | Claude Code | Root `CLAUDE.md` uses `@` imports to load `agent-instructions.md` and `COMMANDS.md` |
-| _(generated)_ | GitHub Copilot | `setup.sh` concatenates sources into `.github/copilot-instructions.md` |
-| _(generated)_ | Cursor | `setup.sh` concatenates sources into `.cursor/rules/agent.mdc` |
+| `tooling/claude.md` | Claude Code | Full generated instructions. Loaded via `@` import in root `CLAUDE.md`. |
+| `CLAUDE.md` (root) | Claude Code | Thin pointer only — two `@` import lines. Auto-loaded by Claude Code at session start. |
+| `COMMANDS.md` | All tools | Human-readable command reference. Aggregated from `skills/*.md`. |
+| `.cursor/rules/agent.mdc` | Cursor | Full instructions with MDC frontmatter (`alwaysApply: true`). |
+| `.github/copilot-instructions.md` | GitHub Copilot | Full instructions. Auto-loaded by Copilot. |
 
 ---
 
-## How the generation works
+## Adding a new tool
 
-`setup.sh` runs once at project setup. After replacing all placeholders, it:
-
-1. Generates `.github/copilot-instructions.md` by concatenating `tooling/agent-instructions.md` and `COMMANDS.md`
-2. Generates `.cursor/rules/agent.mdc` by prepending Cursor frontmatter and concatenating the same sources
-
-Root `CLAUDE.md` is not generated — it uses Claude Code's native `@path` import syntax to load the source files directly at session start.
-
----
-
-## Adding a new tool adapter
-
-1. Add the tool's name and output path to this README
-2. If the tool requires a specific file at a specific path (like Copilot's `.github/` requirement), add a generation step to `setup.sh`
-3. If the tool supports file imports, model the adapter after root `CLAUDE.md`
-4. If the tool requires a self-contained file, model the adapter after the Copilot/Cursor generation steps in `setup.sh`
-5. Never put project logic into an adapter. Logic belongs in `agent-instructions.md`
+1. Add a generation step to `skills/sync.sh` that writes to the path the tool requires
+2. Add the tool to the generated files table above
+3. Never put project logic into a generation step — all logic belongs in `agent-instructions.md`
