@@ -37,3 +37,9 @@ logs/
 # Temporary
 *.bak
 *.tmp
+
+# Generated AI tool adapter files (created by setup.sh / skills/sync.sh)
+.cursor/
+.roo/
+CLAUDE.md
+.clinerules

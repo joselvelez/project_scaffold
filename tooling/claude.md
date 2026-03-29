@@ -25,7 +25,7 @@ These rules apply to every session and every change without exception.
 
 ### On any file change
 
-1. Add an entry to the `[Unreleased]` section of `CHANGELOG.md` describing what changed and why. Never leave a change undocumented.
+1. Add an entry to the `[Unreleased]` section of the changelog describing what changed and why. Never leave a change undocumented. If `.scaffold/CHANGELOG.md` exists, use that file; otherwise use `CHANGELOG.md`.
 2. Do **not** bump the version number on individual changes — version bumping happens only when a push command is issued.
 
 ---
@@ -63,7 +63,7 @@ If "push" appears without a qualifier, respond: "Which type — `push:breaking`,
 
 ### Never
 
-- Never make a change without updating `CHANGELOG.md` `[Unreleased]`
+- Never make a change without updating the changelog `[Unreleased]` section (`.scaffold/CHANGELOG.md` if it exists, otherwise `CHANGELOG.md`)
 - Never bump the version without an explicit push command
 - Never let version numbers drift out of sync across files
 - Never act without stating what will happen first

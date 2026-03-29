@@ -47,7 +47,14 @@ case "$RELEASE_TYPE" in
 esac
 
 VERSION_FILE="$ROOT/VERSION"
-CHANGELOG_FILE="$ROOT/CHANGELOG.md"
+
+# Use .scaffold/CHANGELOG.md if it exists (scaffold template repo),
+# otherwise use CHANGELOG.md (derived projects).
+if [[ -f "$ROOT/.scaffold/CHANGELOG.md" ]]; then
+  CHANGELOG_FILE="$ROOT/.scaffold/CHANGELOG.md"
+else
+  CHANGELOG_FILE="$ROOT/CHANGELOG.md"
+fi
 
 if [[ ! -f "$VERSION_FILE" ]]; then
   echo "Error: VERSION file not found at $VERSION_FILE" >&2
