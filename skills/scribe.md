@@ -7,7 +7,7 @@
 | `scribe:document` | Document a new component, module, or system |
 | `scribe:update` | Update existing documentation in place |
 | `scribe:review` | Full top-down codebase and documentation alignment review |
-| `invoke scribe` | Activate for any documentation task |
+| `scribe:invoke` | Activate for any documentation task |
 
 ---
 

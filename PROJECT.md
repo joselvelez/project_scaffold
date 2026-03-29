@@ -1,13 +1,27 @@
-**{{PROJECT_NAME}}:** {{PROJECT_DESCRIPTION}}
-**Platform:** {{PROJECT_PLATFORM}}
+# {{PROJECT_NAME}} — v0.1.0
+
+{{PROJECT_DESCRIPTION}}
 
 ---
 
-[Replace this section with context for your AI tools. Include:
-- What the system does in 2-3 sentences
-- Key constraints or design decisions that must not be reversed
-- Anything the tool should know before making changes
-- External dependencies or integrations worth flagging
+## Overview
 
-This file is injected into agent instructions every time `bash skills/sync.sh` runs.
-Edit it freely — it is the one file in this system you are meant to change.]
+[Describe what the system does, who it serves, and the core problem it solves.]
+
+---
+
+## Architecture
+
+[Describe the high-level architecture: major layers, services, and how they connect.]
+
+---
+
+## Components
+
+[List the key components of the system and their responsibilities.]
+
+---
+
+## Data Flow
+
+[Describe how data moves through the system — from input to storage to output.]

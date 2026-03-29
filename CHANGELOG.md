@@ -10,6 +10,23 @@ Format: [Semantic Versioning](https://semver.org/). Dates are YYYY-MM-DD.
 
 ---
 
+## [0.7.2] — 2026-03-29
+
+### Added
+- `PROJECT.md` — living system document template with `{{PROJECT_NAME}}` placeholders and sections for Overview, Architecture, Components, and Data Flow; this is the file `setup.sh` expects and renames to `${PROJECT_NAME}.md` during setup
+- Mermaid file-category diagram in `README.md` — visual showing which files are templates, user-edited, generated, and living documents
+
+### Changed
+- Renamed `project.md` → `project-context.md` to eliminate case-only confusion with `PROJECT.md`; updated all references in `skills/sync.sh`, `tooling/agent-instructions.md`, `tooling/README.md`, `README.md`, and `CONTRIBUTING.md`
+- Regenerated all adapter files (`tooling/claude.md`, `COMMANDS.md`, `.cursor/rules/agent.mdc`, `.github/copilot-instructions.md`)
+
+### Fixed
+- `skills/scribe.md` — renamed `invoke scribe` command to `scribe:invoke` for consistency with the colon-delimited command pattern; fixes sync.sh parsing bug that stripped internal spaces producing `invokescribe`
+- `setup.sh` — replaced inline Copilot/Cursor adapter generation with `bash skills/sync.sh` call; inline generation produced files with raw placeholder comments instead of actual skill/prompt/context content
+- `README.md` — replaced all `.cursorrules` references with `.cursor/rules/agent.mdc` (file tree, generated files description, AI tool support table); updated generated files list to include `tooling/claude.md` and `COMMANDS.md` with full source list; updated push command description to reflect `bin/release` automation; added `bin/release`, `prompts/`, and `tooling/` to file tree
+- `CONTRIBUTING.md` — replaced `.cursorrules` reference with `.cursor/rules/agent.mdc` in "Updating AI tool files" section
+- Regenerated all adapter files (`tooling/claude.md`, `COMMANDS.md`, `.cursor/rules/agent.mdc`, `.github/copilot-instructions.md`)
+
 ## [0.7.1] — 2026-03-29
 
 ### Fixed

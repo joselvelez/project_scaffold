@@ -5,7 +5,7 @@ This directory contains AI tool adapter files — the tool-specific configuratio
 **The project rules are not defined here.** They live in:
 
 - `tooling/agent-instructions.md` — edit this to change agent behaviour project-wide
-- `project.md` — edit this to update project-specific context
+- `project-context.md` — edit this to update project-specific context
 - `skills/*.md` — edit these to add or change skill commands
 - `prompts/*.md` — edit these to add or change prompt macros
 
@@ -17,7 +17,7 @@ Never edit the generated files directly. Run `bash skills/sync.sh` instead.
 
 ```
 tooling/agent-instructions.md   ← you edit this
-project.md                      ← you edit this
+project-context.md                      ← you edit this
 skills/*.md                     ← you edit these
 prompts/*.md                    ← you edit these
          │
@@ -30,7 +30,7 @@ prompts/*.md                    ← you edit these
                     └── .github/copilot-instructions.md  (generated)
 ```
 
-`sync.sh` reads `agent-instructions.md`, aggregates `## Commands` tables from every file in `skills/`, reads prompt macros from `prompts/`, appends `project.md` context, and writes the result to each tool's required location and format.
+`sync.sh` reads `agent-instructions.md`, aggregates `## Commands` tables from every file in `skills/`, reads prompt macros from `prompts/`, appends `project-context.md` context, and writes the result to each tool's required location and format.
 
 ---
 

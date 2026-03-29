@@ -96,23 +96,7 @@ fi
 
 # ── Generate tool-specific adapter files ─────────────────────────────────────
 
-# GitHub Copilot — requires a self-contained file at .github/copilot-instructions.md
-# (Copilot does not support file imports)
-{
-  cat tooling/agent-instructions.md
-  printf '\n\n---\n\n'
-  cat COMMANDS.md
-} > .github/copilot-instructions.md
-
-# Cursor — requires a .mdc file with frontmatter at .cursor/rules/
-# (alwaysApply: true loads the rules for every session in this project)
-mkdir -p .cursor/rules
-{
-  printf -- '---\ndescription: Project agent instructions and command reference\nalwaysApply: true\n---\n\n'
-  cat tooling/agent-instructions.md
-  printf '\n\n---\n\n'
-  cat COMMANDS.md
-} > .cursor/rules/agent.mdc
+bash skills/sync.sh
 
 # ── Summary ───────────────────────────────────────────────────────────────────
 

@@ -3,14 +3,14 @@
 #
 # Reads tooling/agent-instructions.md as the canonical template and generates
 # tool-specific adapter files by replacing placeholder comment lines with
-# dynamic content aggregated from skills/*.md, prompts/*.md, and project.md.
+# dynamic content aggregated from skills/*.md, prompts/*.md, and project-context.md.
 #
 # Run this after adding or modifying a skill, prompt macro, or agent instruction:
 #   bash skills/sync.sh
 #
 # Source files (edit these):
 #   tooling/agent-instructions.md  — agent behaviour (the template)
-#   project.md                     — project-specific context
+#   project-context.md                     — project-specific context
 #   skills/*.md                    — skill definitions with ## Commands tables
 #   prompts/*.md                   — prompt macro definitions
 #
@@ -32,7 +32,7 @@ PROMPTS_DIR="$ROOT/prompts"
 AGENT_INSTRUCTIONS="$TOOLING_DIR/agent-instructions.md"
 OUT="$TOOLING_DIR/claude.md"
 COMMANDS_OUT="$ROOT/COMMANDS.md"
-PROJECT_CONTEXT="$ROOT/project.md"
+PROJECT_CONTEXT="$ROOT/project-context.md"
 
 mkdir -p "$TOOLING_DIR"
 mkdir -p "$ROOT/.cursor/rules"
@@ -209,7 +209,7 @@ build_project_context_replacement() {
   if [[ -f "$PROJECT_CONTEXT" ]]; then
     cat "$PROJECT_CONTEXT"
   else
-    echo "_No project context yet. Edit \`project.md\` to add it, then run \`bash skills/sync.sh\`._"
+    echo "_No project context yet. Edit \`project-context.md\` to add it, then run \`bash skills/sync.sh\`._"
   fi
 }
 

@@ -83,9 +83,9 @@ Skills are specialised behavioral modules in `skills/`. Each skill defines a foc
 
 ## Updating AI tool files
 
-`CLAUDE.md`, `.cursorrules`, and `.github/copilot-instructions.md` are generated files. Never edit them directly.
+`CLAUDE.md`, `.cursor/rules/agent.mdc`, and `.github/copilot-instructions.md` are generated files. Never edit them directly.
 
-To update them — after adding a skill or editing `project.md`:
+To update them — after adding a skill or editing `project-context.md`:
 
 ```
 bash skills/sync.sh

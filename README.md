@@ -29,9 +29,9 @@ Without a deliberate foundation, things drift. Documentation goes stale. Changel
 your-project/
 ├── README.md                          ← project README (personalised during setup)
 ├── YourProject.md                     ← living system document — always current
-├── project.md                         ← edit this to update AI tool context
+├── project-context.md                 ← edit this to update AI tool context
 ├── CLAUDE.md                          ← generated — never edit directly
-├── .cursorrules                       ← generated — never edit directly
+├── .cursor/rules/agent.mdc            ← generated — never edit directly
 ├── CONTRIBUTING.md                    ← versioning rules and push commands
 ├── CHANGELOG.md                       ← chronological change record
 ├── VERSION                            ← single canonical version number
@@ -43,12 +43,52 @@ your-project/
 ├── docs/                                ← project documentation (grows with the project)
 │   └── README.md
 ├── bin/
-│   └── project                        ← CLI for read-only commands (no agent needed)
+│   ├── project                        ← CLI for read-only commands (no agent needed)
+│   └── release                        ← automated release script (version, changelog, git, GitHub)
+├── prompts/
+│   ├── doublecheck.md                 ← /doublecheck prompt macro
+│   └── proceed.md                     ← /proceed prompt macro
 ├── skills/
 │   ├── sync.sh                        ← generates all AI tool files
 │   └── scribe.md                      ← documentation specialist skill
+├── tooling/
+│   ├── agent-instructions.md          ← source of truth — edit this, not the adapters
+│   ├── claude.md                      ← generated — never edit directly
+│   └── README.md                      ← explains the tooling architecture
 └── .github/
     └── copilot-instructions.md        ← generated — never edit directly
+```
+
+### File categories
+
+```mermaid
+graph LR
+    subgraph Templates["Templates — transformed during setup"]
+        PROJECT.md
+        README.template.md
+        LICENSE
+    end
+
+    subgraph UserEdited["User-edited — you maintain these directly"]
+        project-context.md
+        tooling/agent-instructions.md
+        skills/*.md
+        prompts/*.md
+    end
+
+    subgraph Generated["Generated — never edit, produced by sync.sh"]
+        CLAUDE.md
+        tooling/claude.md
+        COMMANDS.md
+        .cursor/rules/agent.mdc
+        .github/copilot-instructions.md
+    end
+
+    subgraph Living["Living documents — created from templates, then user-maintained"]
+        YourProject.md["${PROJECT_NAME}.md"]
+        CHANGELOG.md
+        CONTRIBUTING.md
+    end
 ```
 
 ---
@@ -90,11 +130,11 @@ flowchart LR
 
 ### AI tool files are generated, not authored
 
-`CLAUDE.md`, `.cursorrules`, and `.github/copilot-instructions.md` are build artifacts. They are produced by `skills/sync.sh` from two sources: the skill files in `skills/` and the project context in `project.md`. You never write these files directly.
+`CLAUDE.md`, `tooling/claude.md`, `COMMANDS.md`, `.cursor/rules/agent.mdc`, and `.github/copilot-instructions.md` are build artifacts. They are produced by `skills/sync.sh` from the skill files in `skills/`, prompt macros in `prompts/`, project context in `project-context.md`, and agent instructions in `tooling/agent-instructions.md`. You never write these files directly.
 
 ![Scaffold architecture](assets/scaffold-architecture.svg)
 
-**To update AI tool files** — after adding a skill or editing `project.md`:
+**To update AI tool files** — after adding a skill or editing `project-context.md`:
 
 ```
 bash skills/sync.sh
@@ -112,7 +152,7 @@ Instead of asking the AI tool to figure out the version bump, you tell it direct
 | `push:new` | Minor | Something new was added — nothing breaks |
 | `push:fix` | Patch | Something was corrected or cleaned up |
 
-When you issue a push command, the AI tool states the version change, waits for confirmation, bumps all version locations, updates `CHANGELOG.md`, and provides the exact `git tag` command to run.
+When you issue a push command, the AI tool states the version change, waits for one confirmation, then runs `bin/release` — a single command that bumps all version locations, updates `CHANGELOG.md`, commits, tags, pushes, and creates a GitHub release.
 
 **Not sure which command to use?**
 
@@ -155,7 +195,7 @@ For the complete command reference — including AI chat commands and CLI comman
    ```
 5. Answer five prompts: project name, description, platform, author name, and whether it's a JS/TS project
 6. Fill in `YourProject.md` with your system design
-7. Add project context to `project.md`, then run `bash skills/sync.sh`
+7. Add project context to `project-context.md`, then run `bash skills/sync.sh`
 
 ### Option 2 — Clone and reset
 
@@ -210,10 +250,10 @@ The full release process is in `CONTRIBUTING.md`.
 | --- | --- | --- |
 | **Claude Code** | `CLAUDE.md` | Automatically read from repo root at session start |
 | **GitHub Copilot** | `.github/copilot-instructions.md` | Automatically read by Copilot |
-| **Cursor** | `.cursorrules` | Automatically read by Cursor |
+| **Cursor** | `.cursor/rules/agent.mdc` | Automatically read by Cursor (`alwaysApply: true`) |
 | **Other tools** | Any | Point the tool at `CLAUDE.md` |
 
-All three files are generated from the same source by `skills/sync.sh`. They are always identical. If you add a skill or update `project.md`, run `bash skills/sync.sh` and commit the regenerated files.
+All three files are generated from the same source by `skills/sync.sh`. They are always identical. If you add a skill or update `project-context.md`, run `bash skills/sync.sh` and commit the regenerated files.
 
 ---
 
