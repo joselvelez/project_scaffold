@@ -70,6 +70,8 @@ When updating existing documentation:
 
 A full top-down alignment audit of the codebase against all documentation. The goal is to surface every misalignment between what the code actually does, what the documentation claims, and what inline comments assert. **The user decides how to resolve each finding — Scribe only surfaces them.**
 
+> **Excluded from review:** `CHANGELOG.md` is a chronological record, not a behavioral specification. It is never reviewed for alignment with code and should be ignored entirely during `scribe:review`.
+
 #### Evidence Hierarchy
 
 This is non-negotiable. Evidence is evaluated in this order:
@@ -90,7 +92,7 @@ Traverse the entire codebase. For each module, component, service, and function,
 
 **Phase 2 — Read all documentation**
 
-Read every documentation file in scope: `{{PROJECT_NAME}}.md`, `CHANGELOG.md`, `COMMANDS.md`, `README.md`, any files under `docs/`, `skills/`, or `tooling/`. For each documented claim, check it against the code model from Phase 1. Flag every discrepancy.
+Read every documentation file in scope: `{{PROJECT_NAME}}.md`, `COMMANDS.md`, `README.md`, any files under `docs/`, `skills/`, or `tooling/`. Do not review `CHANGELOG.md` — it is excluded from review scope. For each documented claim, check it against the code model from Phase 1. Flag every discrepancy.
 
 **Phase 3 — Read all code comments**
 

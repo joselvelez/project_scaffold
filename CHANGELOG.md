@@ -10,6 +10,12 @@ Format: [Semantic Versioning](https://semver.org/). Dates are YYYY-MM-DD.
 
 ---
 
+## [0.7.3] — 2026-03-29
+
+### Changed
+- `skills/scribe.md` — excluded `CHANGELOG.md` from `scribe:review` scope; added exclusion note at top of review section and removed it from the Phase 2 documentation file list (changelog is a chronological record, not a behavioral specification — reviewing it for code alignment produces unnecessary noise)
+- `skills/sync.sh` — added Cline (`.clinerules`) and Roo Code (`.roo/rules/agent.md`) adapter generation; agent instructions are now surfaced to all supported AI tools automatically
+
 ## [0.7.2] — 2026-03-29
 
 ### Added

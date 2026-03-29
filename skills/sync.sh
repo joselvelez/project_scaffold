@@ -20,6 +20,8 @@
 #   CLAUDE.md
 #   .cursor/rules/agent.mdc
 #   .github/copilot-instructions.md
+#   .clinerules
+#   .roo/rules/agent.md
 #
 # CLAUDE.md (root) is a permanent thin pointer — this script always restores it.
 
@@ -37,6 +39,7 @@ PROJECT_CONTEXT="$ROOT/project-context.md"
 mkdir -p "$TOOLING_DIR"
 mkdir -p "$ROOT/.cursor/rules"
 mkdir -p "$ROOT/.github"
+mkdir -p "$ROOT/.roo/rules"
 
 # ── Guards ────────────────────────────────────────────────────────────────────
 
@@ -351,6 +354,16 @@ COMMANDS_FOOTER
 cp "$OUT" "$ROOT/.github/copilot-instructions.md"
 
 # ---------------------------------------------------------------------------
+# Generate .clinerules — Cline auto-loads this from the project root
+# ---------------------------------------------------------------------------
+cp "$OUT" "$ROOT/.clinerules"
+
+# ---------------------------------------------------------------------------
+# Generate .roo/rules/agent.md — Roo Code auto-loads rules from .roo/rules/
+# ---------------------------------------------------------------------------
+cp "$OUT" "$ROOT/.roo/rules/agent.md"
+
+# ---------------------------------------------------------------------------
 # Restore root CLAUDE.md — always overwrite to prevent accidental edits
 # from drifting. This is the canonical thin pointer; content never lives here.
 # ---------------------------------------------------------------------------
@@ -376,6 +389,8 @@ echo "✓  tooling/claude.md regenerated (from tooling/agent-instructions.md)"
 echo "✓  COMMANDS.md updated"
 echo "✓  .cursor/rules/agent.mdc updated"
 echo "✓  .github/copilot-instructions.md updated"
+echo "✓  .clinerules updated"
+echo "✓  .roo/rules/agent.md updated"
 echo "✓  CLAUDE.md (root) restored to thin pointer"
 echo "   Skills loaded: $skill_count"
 echo "   Commands registered: $cmd_count"
