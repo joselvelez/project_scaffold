@@ -31,6 +31,7 @@ your-project/
 ├── YourProject.md                     ← living system document — always current
 ├── project-context.md                 ← edit this to update AI tool context
 ├── CLAUDE.md                          ← generated — never edit directly
+├── COMMANDS.md                        ← generated — never edit directly
 ├── .cursor/rules/agent.mdc            ← generated — never edit directly
 ├── CONTRIBUTING.md                    ← versioning rules and push commands
 ├── CHANGELOG.md                       ← chronological change record
@@ -259,9 +260,9 @@ The full release process is in `CONTRIBUTING.md`.
 | **Cursor** | `.cursor/rules/agent.mdc` | Automatically read by Cursor (`alwaysApply: true`) |
 | **Cline** | `.clinerules` | Automatically read from project root |
 | **Roo Code** | `.roo/rules/agent.md` | Automatically read from `.roo/rules/` |
-| **Other tools** | Any | Point the tool at `CLAUDE.md` |
+| **Other tools** | `tooling/claude.md` | Point the tool at `tooling/claude.md` — the full generated instructions |
 
-All adapter files are generated from the same source by `skills/sync.sh`. They are always identical in content. If you add a skill or update `project-context.md`, run `bash skills/sync.sh` and commit the regenerated files.
+All adapter files are generated from the same source by `skills/sync.sh`. They share the same agent instructions; `.cursor/rules/agent.mdc` additionally includes MDC frontmatter required by Cursor. If you add a skill or update `project-context.md`, run `bash skills/sync.sh` and commit the regenerated files.
 
 ---
 

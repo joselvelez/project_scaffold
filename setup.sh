@@ -19,6 +19,11 @@ if [ -z "$PROJECT_NAME" ]; then
   exit 1
 fi
 
+if [[ "$PROJECT_NAME" =~ [[:space:]/\|] ]]; then
+  echo "Error: project name must not contain spaces, forward slashes, or pipe characters."
+  exit 1
+fi
+
 read -p "One-line description: " PROJECT_DESC
 read -p "Platform (e.g. Railway, AWS, Vercel): " PROJECT_PLATFORM
 read -p "Author name (for LICENSE): " AUTHOR
@@ -124,7 +129,7 @@ echo "  tooling/agent-instructions.md    ← source of truth — edit this, not 
 echo ""
 echo "Next steps:"
 echo "  1. Fill in ${PROJECT_NAME}.md with your system design"
-echo "  2. Add project context to the bottom of tooling/agent-instructions.md"
+echo "  2. Add project context to project-context.md, then run: bash skills/sync.sh"
 if [ "$PROJECT_TYPE_INPUT" = "1" ]; then
   echo "  3. Set \"version\": \"0.1.0\" in your package.json"
 fi

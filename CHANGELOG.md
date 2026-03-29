@@ -10,6 +10,17 @@ Format: [Semantic Versioning](https://semver.org/). Dates are YYYY-MM-DD.
 
 ---
 
+## [0.7.5] — 2026-03-29
+
+### Fixed
+- `setup.sh` — next-steps output directed users to wrong file for project context (`tooling/agent-instructions.md` instead of `project-context.md`); now correctly says `project-context.md` and includes the `bash skills/sync.sh` reminder
+- `setup.sh` — added input validation for `PROJECT_NAME` rejecting spaces, forward slashes, and pipe characters; previously the comment documented this restriction but the code did not enforce it, allowing names that break sed replacements and markdown links
+- `README.md` — "Other tools" row in AI tool support table pointed to `CLAUDE.md` (a thin pointer using Claude-specific `@` imports); changed to `tooling/claude.md` which contains the full generated instructions
+- `README.md` — corrected claim that adapter files are "always identical in content"; `.cursor/rules/agent.mdc` has MDC frontmatter that other adapters do not
+- `README.md` — added `COMMANDS.md` to the file tree (was present in the mermaid diagram and referenced throughout docs but missing from the tree listing)
+- `skills/sync.sh` — added optional `[summary]` parameter to `bin/release` in the COMMANDS.md CLI section; the parameter exists in `bin/release` code and header comment but was omitted from the generated reference
+- Regenerated all adapter files (`tooling/claude.md`, `COMMANDS.md`, `.cursor/rules/agent.mdc`, `.github/copilot-instructions.md`, `.clinerules`, `.roo/rules/agent.md`)
+
 ## [0.7.4] — 2026-03-29
 
 ### Fixed
