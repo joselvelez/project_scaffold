@@ -152,6 +152,9 @@ for f in "$ROOT"/*.md; do
 done
 
 if [[ -n "$PROJECT_MD" ]]; then
+  # Replaces ALL occurrences of the version string in the project .md file,
+  # not just the header. This is intentional — the version may appear in
+  # multiple places (header, badges, etc.) and all should stay in sync.
   sed "s/$CURRENT_VERSION/$NEW_VERSION/g" "$PROJECT_MD" > "$PROJECT_MD.tmp"
   mv "$PROJECT_MD.tmp" "$PROJECT_MD"
   echo "  ✓ $(basename "$PROJECT_MD") → $NEW_VERSION"

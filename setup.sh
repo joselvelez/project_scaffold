@@ -57,6 +57,7 @@ FILES=(
   "LICENSE"
   "skills/scribe.md"
   "tooling/agent-instructions.md"
+  "project-context.md"
 )
 
 for FILE in "${FILES[@]}"; do
@@ -117,6 +118,8 @@ echo "AI tooling:"
 echo "  CLAUDE.md                        ← Claude Code (auto-loaded at session start)"
 echo "  .github/copilot-instructions.md  ← GitHub Copilot (auto-loaded)"
 echo "  .cursor/rules/agent.mdc          ← Cursor (alwaysApply: true)"
+echo "  .clinerules                      ← Cline (auto-loaded from project root)"
+echo "  .roo/rules/agent.md              ← Roo Code (auto-loaded from .roo/rules/)"
 echo "  tooling/agent-instructions.md    ← source of truth — edit this, not the adapters"
 echo ""
 echo "Next steps:"

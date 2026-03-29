@@ -27,7 +27,9 @@ prompts/*.md                    ← you edit these
                     ├── COMMANDS.md                      (generated)
                     ├── CLAUDE.md                        (generated, thin pointer)
                     ├── .cursor/rules/agent.mdc          (generated)
-                    └── .github/copilot-instructions.md  (generated)
+                    ├── .github/copilot-instructions.md  (generated)
+                    ├── .clinerules                      (generated)
+                    └── .roo/rules/agent.md              (generated)
 ```
 
 `sync.sh` reads `agent-instructions.md`, aggregates `## Commands` tables from every file in `skills/`, reads prompt macros from `prompts/`, appends `project-context.md` context, and writes the result to each tool's required location and format.
@@ -43,6 +45,8 @@ prompts/*.md                    ← you edit these
 | `COMMANDS.md` | All tools | Human-readable command reference. Aggregated from `skills/*.md`. |
 | `.cursor/rules/agent.mdc` | Cursor | Full instructions with MDC frontmatter (`alwaysApply: true`). |
 | `.github/copilot-instructions.md` | GitHub Copilot | Full instructions. Auto-loaded by Copilot. |
+| `.clinerules` | Cline | Full instructions. Auto-loaded from project root. |
+| `.roo/rules/agent.md` | Roo Code | Full instructions. Auto-loaded from `.roo/rules/`. |
 
 ---
 

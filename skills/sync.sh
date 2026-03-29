@@ -371,7 +371,7 @@ cat > "$ROOT/CLAUDE.md" << 'CLAUDE_POINTER'
 <!-- GENERATED FILE — do not edit manually. -->
 <!-- Run `bash skills/sync.sh` to restore if modified. -->
 
-# {{PROJECT_NAME}} — Claude Code
+# Claude Code
 
 @tooling/claude.md
 @COMMANDS.md

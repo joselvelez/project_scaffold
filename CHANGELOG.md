@@ -10,6 +10,18 @@ Format: [Semantic Versioning](https://semver.org/). Dates are YYYY-MM-DD.
 
 ---
 
+## [0.7.4] — 2026-03-29
+
+### Fixed
+- `setup.sh` — added `project-context.md` to FILES array so its `{{PROJECT_NAME}}`, `{{PROJECT_DESCRIPTION}}`, and `{{PROJECT_PLATFORM}}` placeholders are replaced during setup (previously left as raw template text, causing broken placeholder output in all generated adapter files)
+- `README.md` — added `.clinerules` and `.roo/rules/agent.md` to file tree, mermaid file-category diagram, generated files description, and AI tool support table; added Cline and Roo Code as supported tools; corrected "All three files" → "All adapter files"
+- `CONTRIBUTING.md` — added `.clinerules` and `.roo/rules/agent.md` to the list of generated files that must not be edited directly
+- `tooling/README.md` — added `.clinerules` and `.roo/rules/agent.md` to the generated files table and architecture diagram
+- `skills/sync.sh` — replaced `{{PROJECT_NAME}}` in CLAUDE.md heredoc with generic `# Claude Code` heading to prevent unreplaced placeholder appearing in derived projects
+- `CLAUDE.md` — updated heading to match sync.sh change
+- `setup.sh` — added `.clinerules` and `.roo/rules/agent.md` to the post-setup summary output under "AI tooling"
+- `bin/release` — added comment clarifying that the project .md version replacement uses global sed (all occurrences, not just header)
+
 ## [0.7.3] — 2026-03-29
 
 ### Changed

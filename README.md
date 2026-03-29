@@ -55,6 +55,10 @@ your-project/
 │   ├── agent-instructions.md          ← source of truth — edit this, not the adapters
 │   ├── claude.md                      ← generated — never edit directly
 │   └── README.md                      ← explains the tooling architecture
+├── .clinerules                        ← generated — never edit directly
+├── .roo/
+│   └── rules/
+│       └── agent.md                   ← generated — never edit directly
 └── .github/
     └── copilot-instructions.md        ← generated — never edit directly
 ```
@@ -82,6 +86,8 @@ graph LR
         COMMANDS.md
         .cursor/rules/agent.mdc
         .github/copilot-instructions.md
+        .clinerules
+        .roo/rules/agent.md
     end
 
     subgraph Living["Living documents — created from templates, then user-maintained"]
@@ -130,7 +136,7 @@ flowchart LR
 
 ### AI tool files are generated, not authored
 
-`CLAUDE.md`, `tooling/claude.md`, `COMMANDS.md`, `.cursor/rules/agent.mdc`, and `.github/copilot-instructions.md` are build artifacts. They are produced by `skills/sync.sh` from the skill files in `skills/`, prompt macros in `prompts/`, project context in `project-context.md`, and agent instructions in `tooling/agent-instructions.md`. You never write these files directly.
+`CLAUDE.md`, `tooling/claude.md`, `COMMANDS.md`, `.cursor/rules/agent.mdc`, `.github/copilot-instructions.md`, `.clinerules`, and `.roo/rules/agent.md` are build artifacts. They are produced by `skills/sync.sh` from the skill files in `skills/`, prompt macros in `prompts/`, project context in `project-context.md`, and agent instructions in `tooling/agent-instructions.md`. You never write these files directly.
 
 ![Scaffold architecture](assets/scaffold-architecture.svg)
 
@@ -251,9 +257,11 @@ The full release process is in `CONTRIBUTING.md`.
 | **Claude Code** | `CLAUDE.md` | Automatically read from repo root at session start |
 | **GitHub Copilot** | `.github/copilot-instructions.md` | Automatically read by Copilot |
 | **Cursor** | `.cursor/rules/agent.mdc` | Automatically read by Cursor (`alwaysApply: true`) |
+| **Cline** | `.clinerules` | Automatically read from project root |
+| **Roo Code** | `.roo/rules/agent.md` | Automatically read from `.roo/rules/` |
 | **Other tools** | Any | Point the tool at `CLAUDE.md` |
 
-All three files are generated from the same source by `skills/sync.sh`. They are always identical. If you add a skill or update `project-context.md`, run `bash skills/sync.sh` and commit the regenerated files.
+All adapter files are generated from the same source by `skills/sync.sh`. They are always identical in content. If you add a skill or update `project-context.md`, run `bash skills/sync.sh` and commit the regenerated files.
 
 ---
 
