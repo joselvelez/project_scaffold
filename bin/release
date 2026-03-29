@@ -1,0 +1,236 @@
+#!/usr/bin/env bash
+#
+# bin/release — Automated release script for push:fix, push:new, push:breaking.
+#
+# Performs the entire release sequence in one command:
+#   1. Computes the new version from the current VERSION file
+#   2. Bumps the version in all required locations
+#   3. Moves [Unreleased] entries in CHANGELOG.md into a versioned section
+#   4. Commits all changes
+#   5. Creates a git tag
+#   6. Pushes to origin (main + tag)
+#   7. Creates a GitHub release with changelog notes
+#
+# Usage:
+#   bin/release <type> [summary]
+#
+#   type     One of: major, minor, patch
+#   summary  Optional one-line summary for the tag and release title.
+#            If omitted, extracted from the first changelog entry.
+#
+# This script must be run from the repository root.
+# It is designed to be called by AI agents as a single command after
+# presenting a release plan and receiving user confirmation.
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$(dirname "$SCRIPT_DIR")"
+
+# ── Guards ────────────────────────────────────────────────────────────────────
+
+if [[ -z "${1:-}" ]]; then
+  echo "Error: missing release type." >&2
+  echo "Usage: bin/release <major|minor|patch> [summary]" >&2
+  exit 1
+fi
+
+RELEASE_TYPE="$1"
+SUMMARY="${2:-}"
+
+case "$RELEASE_TYPE" in
+  major|minor|patch) ;;
+  *)
+    echo "Error: invalid release type '$RELEASE_TYPE'. Must be major, minor, or patch." >&2
+    exit 1
+    ;;
+esac
+
+VERSION_FILE="$ROOT/VERSION"
+CHANGELOG_FILE="$ROOT/CHANGELOG.md"
+
+if [[ ! -f "$VERSION_FILE" ]]; then
+  echo "Error: VERSION file not found at $VERSION_FILE" >&2
+  exit 1
+fi
+
+if [[ ! -f "$CHANGELOG_FILE" ]]; then
+  echo "Error: CHANGELOG.md not found at $CHANGELOG_FILE" >&2
+  exit 1
+fi
+
+# ── Read current version ──────────────────────────────────────────────────────
+
+CURRENT_VERSION="$(cat "$VERSION_FILE" | tr -d '[:space:]')"
+
+if [[ ! "$CURRENT_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "Error: VERSION file contains invalid version '$CURRENT_VERSION'" >&2
+  exit 1
+fi
+
+IFS='.' read -r V_MAJOR V_MINOR V_PATCH <<< "$CURRENT_VERSION"
+
+# ── Compute new version ──────────────────────────────────────────────────────
+
+case "$RELEASE_TYPE" in
+  major)
+    V_MAJOR=$((V_MAJOR + 1))
+    V_MINOR=0
+    V_PATCH=0
+    ;;
+  minor)
+    V_MINOR=$((V_MINOR + 1))
+    V_PATCH=0
+    ;;
+  patch)
+    V_PATCH=$((V_PATCH + 1))
+    ;;
+esac
+
+NEW_VERSION="${V_MAJOR}.${V_MINOR}.${V_PATCH}"
+TODAY="$(date +%Y-%m-%d)"
+
+echo "Release: $CURRENT_VERSION → $NEW_VERSION ($RELEASE_TYPE)"
+
+# ── Extract [Unreleased] content ─────────────────────────────────────────────
+
+UNRELEASED_CONTENT="$(awk '
+  /^## \[Unreleased\]/ { found=1; next }
+  found && /^---$/     { exit }
+  found                { print }
+' "$CHANGELOG_FILE")"
+
+# Strip leading and trailing blank lines (portable awk, no BSD/GNU sed issues)
+UNRELEASED_CONTENT="$(echo "$UNRELEASED_CONTENT" | awk '
+  NF { found=1 }
+  found { lines[++n]=$0 }
+  END {
+    last=n
+    for (i=n; i>=1; i--) { if (lines[i] != "") { last=i; break } }
+    for (i=1; i<=last; i++) print lines[i]
+  }
+')"
+
+if [[ -z "$UNRELEASED_CONTENT" ]]; then
+  echo "Error: [Unreleased] section in CHANGELOG.md is empty. Nothing to release." >&2
+  exit 1
+fi
+
+# ── Extract summary if not provided ──────────────────────────────────────────
+
+if [[ -z "$SUMMARY" ]]; then
+  # Use the first non-heading, non-empty line as summary
+  SUMMARY="$(echo "$UNRELEASED_CONTENT" | grep -v '^###' | grep -v '^$' | head -1 | sed 's/^- //')"
+  # Truncate to 72 chars for tag message
+  SUMMARY="${SUMMARY:0:72}"
+fi
+
+# ── Bump VERSION file ────────────────────────────────────────────────────────
+
+echo "$NEW_VERSION" > "$VERSION_FILE"
+echo "  ✓ VERSION → $NEW_VERSION"
+
+# ── Bump version in project .md header (if it exists and contains a version) ─
+
+# Find the project .md file (matches {{PROJECT_NAME}}.md pattern — any .md
+# file in root that is NOT a known scaffold file)
+PROJECT_MD=""
+for f in "$ROOT"/*.md; do
+  basename="$(basename "$f")"
+  case "$basename" in
+    README.md|README.template.md|CHANGELOG.md|CONTRIBUTING.md|COMMANDS.md|CLAUDE.md)
+      continue
+      ;;
+    *)
+      # Check if this file contains the current version in a header-like context
+      if grep -q "$CURRENT_VERSION" "$f" 2>/dev/null; then
+        PROJECT_MD="$f"
+        break
+      fi
+      ;;
+  esac
+done
+
+if [[ -n "$PROJECT_MD" ]]; then
+  sed "s/$CURRENT_VERSION/$NEW_VERSION/g" "$PROJECT_MD" > "$PROJECT_MD.tmp"
+  mv "$PROJECT_MD.tmp" "$PROJECT_MD"
+  echo "  ✓ $(basename "$PROJECT_MD") → $NEW_VERSION"
+fi
+
+# ── Bump version in package.json (if it exists) ──────────────────────────────
+
+PACKAGE_JSON="$ROOT/package.json"
+if [[ -f "$PACKAGE_JSON" ]]; then
+  # Use sed to replace the version field precisely
+  sed "s/\"version\": \"$CURRENT_VERSION\"/\"version\": \"$NEW_VERSION\"/" "$PACKAGE_JSON" > "$PACKAGE_JSON.tmp"
+  mv "$PACKAGE_JSON.tmp" "$PACKAGE_JSON"
+  echo "  ✓ package.json → $NEW_VERSION"
+fi
+
+# ── Update CHANGELOG.md ──────────────────────────────────────────────────────
+
+# Write unreleased content to a temp file so awk can read it without
+# newline-in-string issues
+UNRELEASED_TMP="$(mktemp)"
+echo "$UNRELEASED_CONTENT" > "$UNRELEASED_TMP"
+
+awk -v new_version="$NEW_VERSION" -v today="$TODAY" -v content_file="$UNRELEASED_TMP" '
+  /^## \[Unreleased\]/ {
+    print $0
+    print ""
+    print "---"
+    print ""
+    print "## [" new_version "] — " today
+    print ""
+    while ((getline line < content_file) > 0) print line
+    close(content_file)
+    skip=1
+    next
+  }
+  skip && /^---$/ {
+    skip=0
+    next
+  }
+  skip { next }
+  { print }
+' "$CHANGELOG_FILE" > "$CHANGELOG_FILE.tmp"
+
+rm -f "$UNRELEASED_TMP"
+mv "$CHANGELOG_FILE.tmp" "$CHANGELOG_FILE"
+echo "  ✓ CHANGELOG.md → [Unreleased] moved to [$NEW_VERSION]"
+
+# ── Build commit message ─────────────────────────────────────────────────────
+
+COMMIT_MSG="release: v${NEW_VERSION} — ${SUMMARY}
+
+${UNRELEASED_CONTENT}"
+
+# ── Git: add, commit, tag, push ──────────────────────────────────────────────
+
+cd "$ROOT"
+
+git add -A
+echo "  ✓ git add -A"
+
+git commit -m "$COMMIT_MSG"
+echo "  ✓ git commit"
+
+git tag -a "v${NEW_VERSION}" -m "Release v${NEW_VERSION} — ${SUMMARY}"
+echo "  ✓ git tag v${NEW_VERSION}"
+
+git push origin main
+echo "  ✓ git push origin main"
+
+git push origin "v${NEW_VERSION}"
+echo "  ✓ git push origin v${NEW_VERSION}"
+
+# ── GitHub release ────────────────────────────────────────────────────────────
+
+# Use the unreleased content as release notes
+gh release create "v${NEW_VERSION}" \
+  --title "v${NEW_VERSION} — ${SUMMARY}" \
+  --notes "$UNRELEASED_CONTENT"
+echo "  ✓ gh release create v${NEW_VERSION}"
+
+echo ""
+echo "Done. Released v${NEW_VERSION}."

@@ -10,6 +10,22 @@ Format: [Semantic Versioning](https://semver.org/). Dates are YYYY-MM-DD.
 
 ---
 
+## [0.7.0] — 2026-03-29
+
+### Added
+- `bin/release` — single-command release script that handles version bump, changelog update, git commit, tag, push, and GitHub release creation
+- Single-approval push command pattern — agents present one confirmation prompt then run `bin/release` as a single command
+
+### Changed
+- `tooling/agent-instructions.md` — rewritten as canonical template with placeholder markers (`<!-- {{SKILL_COMMANDS}} -->`, `<!-- {{PROMPT_MACROS}} -->`, `<!-- {{PROJECT_CONTEXT}} -->`), source-file header comment, session-start section, corrected changelog tracking (no version bump on individual changes), single-approval push behavior via `bin/release`
+- `skills/sync.sh` — refactored to read `agent-instructions.md` as template source instead of hardcoded heredocs; substitutes placeholder lines with dynamic content; fixed header comment to identify `agent-instructions.md` as source file
+- `CONTRIBUTING.md` — release process aligned with single-approval behavior; references `bin/release`
+- `project.md` — fixed inaccurate instruction ("appended to CLAUDE.md" → "injected into agent instructions")
+- Regenerated all adapter files (`tooling/claude.md`, `.cursor/rules/agent.mdc`, `.github/copilot-instructions.md`, `COMMANDS.md`)
+
+### Fixed
+- `skills/sync.sh` now actually reads `tooling/agent-instructions.md` as documented in `tooling/README.md` — previously the script ignored this file and used hardcoded heredocs
+
 ## [0.6.0] — 2026-03-28
 
 ### Changed

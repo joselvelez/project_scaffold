@@ -1,18 +1,27 @@
 #!/usr/bin/env bash
 # skills/sync.sh
 #
-# Regenerates tooling/agent-instructions.md, COMMANDS.md,
-# .cursor/rules/agent.mdc, and .github/copilot-instructions.md
-# from skills/*.md, prompts/*.md, and project.md.
+# Reads tooling/agent-instructions.md as the canonical template and generates
+# tool-specific adapter files by replacing placeholder comment lines with
+# dynamic content aggregated from skills/*.md, prompts/*.md, and project.md.
 #
-# Run this after adding or modifying a skill or prompt macro:
+# Run this after adding or modifying a skill, prompt macro, or agent instruction:
 #   bash skills/sync.sh
 #
-# Do not edit tooling/agent-instructions.md, COMMANDS.md,
-# .cursor/rules/agent.mdc, or .github/copilot-instructions.md directly.
-# They will be overwritten the next time this script runs.
+# Source files (edit these):
+#   tooling/agent-instructions.md  — agent behaviour (the template)
+#   project.md                     — project-specific context
+#   skills/*.md                    — skill definitions with ## Commands tables
+#   prompts/*.md                   — prompt macro definitions
 #
-# CLAUDE.md (root) is a permanent thin pointer — this script never touches it.
+# Generated files (do not edit):
+#   tooling/claude.md
+#   COMMANDS.md
+#   CLAUDE.md
+#   .cursor/rules/agent.mdc
+#   .github/copilot-instructions.md
+#
+# CLAUDE.md (root) is a permanent thin pointer — this script always restores it.
 
 set -euo pipefail
 
@@ -20,6 +29,7 @@ SKILLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(dirname "$SKILLS_DIR")"
 TOOLING_DIR="$ROOT/tooling"
 PROMPTS_DIR="$ROOT/prompts"
+AGENT_INSTRUCTIONS="$TOOLING_DIR/agent-instructions.md"
 OUT="$TOOLING_DIR/claude.md"
 COMMANDS_OUT="$ROOT/COMMANDS.md"
 PROJECT_CONTEXT="$ROOT/project.md"
@@ -27,6 +37,13 @@ PROJECT_CONTEXT="$ROOT/project.md"
 mkdir -p "$TOOLING_DIR"
 mkdir -p "$ROOT/.cursor/rules"
 mkdir -p "$ROOT/.github"
+
+# ── Guards ────────────────────────────────────────────────────────────────────
+
+if [[ ! -f "$AGENT_INSTRUCTIONS" ]]; then
+  echo "Error: $AGENT_INSTRUCTIONS not found." >&2
+  exit 1
+fi
 
 # ---------------------------------------------------------------------------
 # Parse ## Commands tables from each skill file.
@@ -159,133 +176,85 @@ build_prompts_section() {
 }
 
 # ---------------------------------------------------------------------------
-# Write tooling/claude.md
+# Build the dynamic content for each placeholder
 # ---------------------------------------------------------------------------
-cat > "$OUT" << 'STATIC_HEADER'
-<!-- GENERATED FILE — do not edit manually. -->
-<!-- Run `bash skills/sync.sh` to regenerate after adding or changing a skill. -->
 
-# {{PROJECT_NAME}} — Agent Instructions
+build_skill_commands_replacement() {
+  echo "| Command | What it does |"
+  echo "| --- | --- |"
+  build_commands_table
+  echo ""
+  echo "When a skill command is detected:"
+  echo ""
+  echo "1. Read the corresponding file in \`skills/\`."
+  echo "2. Adopt its identity, rules, and output standards for the duration of that task."
+  echo "3. Announce: \"Invoking [Skill] — operating under \`skills/[file].md\`.\""
+  echo ""
+  echo "Skill commands are the only way to invoke a skill. There are no automatic triggers."
+  echo "If a skill command is unrecognised, list available commands from the table above."
+}
 
-You are working on {{PROJECT_NAME}}. Read `{{PROJECT_NAME}}.md` before making any changes.
-It is the source of truth for what this system is and how it is structured.
+build_prompt_macros_replacement() {
+  echo "Prompt macros are shorthand triggers that expand into predefined text. When a user's message ends with a prompt macro trigger (e.g. \`/doublecheck\`), treat the message as if the full expansion text below was appended to it."
+  echo ""
+  echo "**Rules:**"
+  echo "- The trigger must appear at the end of the user's message"
+  echo "- Append the expansion text to the user's original message — do not replace it"
+  echo "- Follow every instruction in the expanded text for the duration of that response"
+  echo ""
+  build_prompts_section
+}
 
----
+build_project_context_replacement() {
+  if [[ -f "$PROJECT_CONTEXT" ]]; then
+    cat "$PROJECT_CONTEXT"
+  else
+    echo "_No project context yet. Edit \`project.md\` to add it, then run \`bash skills/sync.sh\`._"
+  fi
+}
 
-## Session start
+# ---------------------------------------------------------------------------
+# Write tooling/claude.md — read template, replace placeholders
+# ---------------------------------------------------------------------------
 
-Before any other action:
+# Pre-build replacement content into temp files for reliable substitution
+SKILL_CONTENT=$(build_skill_commands_replacement)
+PROMPT_CONTENT=$(build_prompt_macros_replacement)
+CONTEXT_CONTENT=$(build_project_context_replacement)
 
-1. Read `{{PROJECT_NAME}}.md` — understand the current system state.
-2. Read the version from `VERSION` and confirm it aloud: "Ready. Current version: X.Y.Z."
+{
+  echo "<!-- GENERATED FILE — do not edit manually. -->"
+  echo "<!-- Edit tooling/agent-instructions.md, then run \`bash skills/sync.sh\` to regenerate. -->"
+  echo ""
 
----
+  # Read the template, stripping the source-file HTML comment block and
+  # replacing placeholder lines with dynamic content
+  in_header_comment=false
+  while IFS= read -r line; do
+    # Skip the source-file header comment (<!-- ... -->)
+    if [[ "$line" == "<!--" ]]; then
+      in_header_comment=true
+      continue
+    fi
+    if $in_header_comment; then
+      if [[ "$line" == "-->" ]]; then
+        in_header_comment=false
+      fi
+      continue
+    fi
 
-## Versioning and push commands
-
-Use one of these commands when you are ready to commit and push.
-Never use bare "push" — it will be rejected until a qualifier is given.
-
-| Command | Bump | Example |
-| --- | --- | --- |
-| `push:breaking` | Major | `0.1.0 → 1.0.0` |
-| `push:new` | Minor | `0.1.0 → 0.2.0` |
-| `push:fix` | Patch | `0.1.0 → 0.1.1` |
-
-When a push command is detected:
-
-1. State: "Current version is X. This will become Y."
-2. Wait for explicit confirmation before changing any file.
-3. Bump the version in all required locations: `VERSION`, `{{PROJECT_NAME}}.md` header, `package.json` (if it exists).
-4. Update `CHANGELOG.md` — move `[Unreleased]` into a new versioned section with today's date.
-5. **Execute the full release sequence yourself — do not just display the commands.** Run each command via the terminal:
-   1. `git add -A && git commit -m "<detailed commit message>"`
-   2. `git tag -a vX.Y.Z -m "Release vX.Y.Z — <one line summary>"`
-   3. `git push origin main`
-   4. `git push origin vX.Y.Z`
-   5. `gh release create vX.Y.Z --title "vX.Y.Z — <one line summary>" --notes "<changelog entry for this version>"`
-
-Extract the release notes from the versioned entry just written to `CHANGELOG.md` and populate them inline — do not leave placeholders. Do not skip any step. Do not present commands for the user to run — execute them.
-
-If "push" appears without a qualifier, respond: "Which type — `push:breaking`, `push:new`, or `push:fix`?
-See `CONTRIBUTING.md` for the decision tree." Do not proceed without a qualified command.
-
-**Never:**
-- Touch any file without updating `CHANGELOG.md [Unreleased]`
-- Bump the version without an explicit push command
-- Let version numbers drift out of sync across files
-- Act without stating what will happen first
-
----
-
-## Skill commands
-
-STATIC_HEADER
-
-# Append the generated commands table
-echo "| Command | What it does |" >> "$OUT"
-echo "| --- | --- |" >> "$OUT"
-build_commands_table >> "$OUT"
-
-cat >> "$OUT" << 'SKILL_FOOTER'
-
-When a skill command is detected:
-
-1. Read the corresponding file in `skills/`.
-2. Adopt its identity, rules, and output standards for the duration of that task.
-3. Announce: "Invoking [Skill] — operating under `skills/[file].md`."
-
-Skill commands are the only way to invoke a skill. There are no automatic triggers.
-If a skill command is unrecognised, list available commands from the table above.
-
----
-
-## Prompt macros
-
-Prompt macros are shorthand triggers that expand into predefined text. When a user's message ends with a prompt macro trigger (e.g. `/doublecheck`), treat the message as if the full expansion text below was appended to it.
-
-**Rules:**
-- The trigger must appear at the end of the user's message
-- Append the expansion text to the user's original message — do not replace it
-- Follow every instruction in the expanded text for the duration of that response
-
-SKILL_FOOTER
-
-# Append the generated prompt macros section
-build_prompts_section >> "$OUT"
-
-cat >> "$OUT" << 'STATIC_FOOTER'
-
----
-
-## Key files
-
-| File | Purpose |
-| --- | --- |
-| `{{PROJECT_NAME}}.md` | Living system document — current state of the system |
-| `CHANGELOG.md` | Chronological record of every change |
-| `CONTRIBUTING.md` | Versioning rules, push commands, decision tree |
-| `VERSION` | Canonical version number |
-| `COMMANDS.md` | All available commands — generated by `bash skills/sync.sh` |
-| `project.md` | Edit this to update AI tool context, then run `bash skills/sync.sh` |
-| `skills/sync.sh` | Run this after adding or changing a skill |
-| `prompts/` | Prompt macro definitions — edit these, then run `bash skills/sync.sh` |
-| `docs/` | Project documentation — grows with the project |
-
----
-
-## Project context
-
-STATIC_FOOTER
-
-# Append the user's project context (or a placeholder if missing)
-if [[ -f "$PROJECT_CONTEXT" ]]; then
-  cat "$PROJECT_CONTEXT" >> "$OUT"
-else
-  cat >> "$OUT" << 'NO_CONTEXT'
-_No project context yet. Edit `project.md` to add it, then run `bash skills/sync.sh`._
-NO_CONTEXT
-fi
+    # Replace placeholder lines
+    if [[ "$line" == "<!-- {{SKILL_COMMANDS}} -->" ]]; then
+      echo "$SKILL_CONTENT"
+    elif [[ "$line" == "<!-- {{PROMPT_MACROS}} -->" ]]; then
+      echo "$PROMPT_CONTENT"
+    elif [[ "$line" == "<!-- {{PROJECT_CONTEXT}} -->" ]]; then
+      echo "$CONTEXT_CONTENT"
+    else
+      echo "$line"
+    fi
+  done < "$AGENT_INSTRUCTIONS"
+} > "$OUT"
 
 # ---------------------------------------------------------------------------
 # Write COMMANDS.md — human-readable command reference, generated from skills
@@ -352,6 +321,7 @@ Read-only commands can be run directly from the terminal without an AI agent:
 bin/project status     # version, last release, unreleased changes
 bin/project commands   # display this reference
 bin/project help       # usage information
+bin/release <type>     # run a release (major, minor, patch)
 ```
 
 ---
@@ -402,7 +372,7 @@ cmd_count=$(build_commands_table | grep -c "^\| \`" || true)
 prompt_count=$(find "$PROMPTS_DIR" -maxdepth 1 -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
 
 echo ""
-echo "✓  tooling/claude.md regenerated"
+echo "✓  tooling/claude.md regenerated (from tooling/agent-instructions.md)"
 echo "✓  COMMANDS.md updated"
 echo "✓  .cursor/rules/agent.mdc updated"
 echo "✓  .github/copilot-instructions.md updated"

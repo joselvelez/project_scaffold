@@ -53,18 +53,25 @@ Read it top to bottom. Answer each question. The first **Yes** determines your c
 
 ## Release process
 
-When you issue a push command, the AI tool executes these steps in order.
+When you issue a push command, the AI tool presents a **single confirmation prompt** and then runs `bin/release` — one command that does everything.
 
-1. **States the version** — announces current and new version before touching anything.
-2. **Waits for confirmation** — does not modify any file until you confirm.
-3. **Bumps the version** in all required locations simultaneously.
-4. **Updates `CHANGELOG.md`** — moves `[Unreleased]` entries into a new versioned section with today's date.
-5. **Provides the tag command:**
-   ```
-   git tag -a vX.Y.Z -m "Release vX.Y.Z — <one line summary>"
-   git push origin vX.Y.Z
-   ```
-6. **Reminds** to create a GitHub Release from that tag using the `CHANGELOG.md` entry as release notes.
+1. **Presents a release summary** — current version, new version, and the changelog entries to be released.
+2. **Waits for one confirmation** — does not modify any file until you say "yes." This is the only prompt.
+3. **Runs `bin/release <type>`** — a single command that handles the entire release:
+   - Bumps the version in `VERSION`, project `.md` header, and `package.json` (if present)
+   - Moves `[Unreleased]` entries in `CHANGELOG.md` into a new versioned section with today's date
+   - `git add -A && git commit`
+   - `git tag -a vX.Y.Z`
+   - `git push origin main && git push origin vX.Y.Z`
+   - `gh release create vX.Y.Z`
+
+You can also run `bin/release` directly from the terminal without an AI agent:
+
+```
+bin/release patch   # push:fix
+bin/release minor   # push:new
+bin/release major   # push:breaking
+```
 
 ---
 
