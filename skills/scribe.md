@@ -6,7 +6,7 @@
 |---|---|
 | `scribe:document` | Document a new component, module, or system |
 | `scribe:update` | Update existing documentation in place |
-| `scribe:adr` | Write an architectural decision record |
+| `scribe:review` | Full top-down codebase and documentation alignment review |
 | `invoke scribe` | Activate for any documentation task |
 
 ---
@@ -64,27 +64,93 @@ When updating existing documentation:
 3. Ensure diagrams still reflect the updated state
 4. Update `CHANGELOG.md`
 
-### `scribe:adr`
+---
 
-An architectural decision record captures a significant design choice: what was decided, why, and what alternatives were rejected. Format:
+### `scribe:review`
 
-```markdown
-## ADR-NNN: <Decision title>
+A full top-down alignment audit of the codebase against all documentation. The goal is to surface every misalignment between what the code actually does, what the documentation claims, and what inline comments assert. **The user decides how to resolve each finding — Scribe only surfaces them.**
 
-**Date:** YYYY-MM-DD
-**Status:** Accepted
+#### Evidence Hierarchy
 
-### Context
-[What situation or constraint forced this decision?]
+This is non-negotiable. Evidence is evaluated in this order:
 
-### Decision
-[What was decided?]
+1. **Code** — the only ground truth. What the code does is what the system does.
+2. **Documentation** — checked against code. Wrong if it contradicts code.
+3. **Code comments** — checked last. Never treated as authoritative. A comment that contradicts the code is wrong, not the code.
 
-### Consequences
-[What becomes easier or harder as a result?]
+Do not infer behavior from comments. Do not treat a comment as evidence that code "intends" to behave differently. Read the code first, always.
 
-### Alternatives considered
-[What else was evaluated and why it was not chosen?]
+#### Review Procedure
+
+Execute in this exact order. Do not skip phases or reorder them.
+
+**Phase 1 — Read all code**
+
+Traverse the entire codebase. For each module, component, service, and function, establish what it actually does: inputs, outputs, side effects, dependencies, control flow, error handling. Build a complete internal model of system behavior from code alone. Do not read documentation or comments during this phase.
+
+**Phase 2 — Read all documentation**
+
+Read every documentation file in scope: `{{PROJECT_NAME}}.md`, `CHANGELOG.md`, `COMMANDS.md`, `README.md`, any files under `docs/`, `skills/`, or `tooling/`. For each documented claim, check it against the code model from Phase 1. Flag every discrepancy.
+
+**Phase 3 — Read all code comments**
+
+Read inline comments, JSDoc/TSDoc blocks, and any other in-code documentation. For each comment, check it against the code it annotates. Flag every discrepancy. Comments are checked last because they carry the least authority — a comment that differs from code is always a comment problem, not a code problem.
+
+#### Findings Format
+
+Every finding is a discrete, numbered entry. No prose summaries. No grouping by theme. One finding per misalignment.
+
+```
+[SEVERITY] #NNN
+File/Section: <path or doc section>
+Code says:    <what the code actually does>
+Doc/Comment claims: <what the documentation or comment asserts>
+Notes:        <any context needed to understand the discrepancy>
 ```
 
-ADRs are appended to `{{PROJECT_NAME}}.md` under a dedicated `## Architectural Decisions` section, or to a separate `docs/decisions/` directory if one exists.
+**Severity levels:**
+
+| Level | Meaning |
+|---|---|
+| `[CRITICAL]` | The documented behavior directly contradicts the code in a way that could cause incorrect usage, wrong integration assumptions, or user-facing errors. |
+| `[DRIFT]` | The documentation or comment was once accurate but no longer reflects the current implementation. Not immediately dangerous but will mislead. |
+| `[STALE]` | A comment or doc section refers to something that has changed in a minor way — a renamed variable, a slightly different return shape, a removed parameter. Low risk but creates noise. |
+| `[UNDOCUMENTED]` | Code exists with no corresponding documentation entry. The gap runs in the other direction — the system does something the docs do not acknowledge at all. |
+
+#### Review Output Structure
+
+```
+## scribe:review — {{PROJECT_NAME}}
+Date: YYYY-MM-DD
+
+### Summary
+- Total findings: N
+- [CRITICAL]: N
+- [DRIFT]: N
+- [STALE]: N
+- [UNDOCUMENTED]: N
+
+### Findings
+
+[CRITICAL] #001
+File/Section: src/services/auth.service.ts / AuthService.validateToken()
+Code says:    Returns `null` when token is expired
+Doc claims:   "Returns false on invalid token" ({{PROJECT_NAME}}.md §Authentication)
+Notes:        Callers checking for `=== false` will miss expired token cases entirely.
+
+[UNDOCUMENTED] #002
+File/Section: src/workers/cleanup.worker.ts / CleanupWorker
+Code says:    Runs a distributed lock check before every job execution using RedisLockService
+Doc claims:   No documentation exists for CleanupWorker or its locking behavior
+Notes:        Core concurrency behavior with no documentation entry anywhere.
+
+... (all findings follow the same format)
+
+### No findings
+If a phase produced no misalignments, state it explicitly:
+- Phase 2 (Documentation): No misalignments found.
+```
+
+#### Completion Criteria
+
+The review is complete when all three phases have been executed in full and every finding has been recorded. Do not stop early. Do not omit findings because they seem minor — severity classification is for the user to act on, not a filter for what gets reported.

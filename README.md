@@ -120,15 +120,9 @@ When you issue a push command, the AI tool states the version change, waits for 
 
 ### Skill commands — AI chat, explicit invocation only
 
-Skills are specialised behavioral modules in `skills/`. Each skill defines a focused identity, rules, and output standards for a specific type of work. They are invoked with explicit commands in your editor's AI chat — there are no automatic triggers, no judgment calls.
+Skills are specialised behavioral modules in `skills/`. Each skill defines a focused identity, rules, and output standards for a specific type of work. They are invoked with explicit commands in your editor's AI chat — there are no automatic triggers, no judgment calls. Each skill file lists its own commands in a `## Commands` table.
 
-| Command | Skill | What it does |
-| --- | --- | --- |
-| `scribe:document` | Scribe | Write documentation for a new component or feature |
-| `scribe:update` | Scribe | Update existing documentation in-place |
-| `scribe:review` | Scribe | Review documentation for accuracy and completeness |
-
-When you type a skill command in your editor's AI chat, the tool reads the corresponding `skills/*.md` file and operates under its rules for that task. When the task is done, normal behaviour resumes.
+When you type a skill command in your editor's AI chat, the tool reads the corresponding `skills/*.md` file and operates under its rules for that task. When the task is done, normal behaviour resumes. See `COMMANDS.md` for the full list of available skill commands.
 
 **Adding a new skill:** create a `skills/your-skill.md` file with a `## Commands` section, then run `bash skills/sync.sh`. The new commands appear in `CLAUDE.md` automatically — no manual routing required.
 

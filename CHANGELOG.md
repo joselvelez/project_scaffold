@@ -10,6 +10,12 @@ Format: [Semantic Versioning](https://semver.org/). Dates are YYYY-MM-DD.
 
 ---
 
+## [0.7.1] — 2026-03-29
+
+### Fixed
+- `README.md` — removed phantom `scribe:review` command from skill commands table (command was removed in 0.3.0 but the README table was never updated); replaced inline commands table with a reference to `COMMANDS.md` to prevent future drift
+- `CONTRIBUTING.md` — same phantom `scribe:review` in skill commands table; replaced inline table with reference to `COMMANDS.md`
+
 ## [0.7.0] — 2026-03-29
 
 ### Added

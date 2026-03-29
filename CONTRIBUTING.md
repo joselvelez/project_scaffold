@@ -77,13 +77,7 @@ bin/release major   # push:breaking
 
 ## Skill commands
 
-Skills are specialised behavioral modules in `skills/`. Each skill defines a focused identity and rules for a specific type of work. Invoke them explicitly with their commands — there are no automatic triggers.
-
-| Command | What it does |
-| --- | --- |
-| `scribe:document` | Write documentation for a new component, module, or feature |
-| `scribe:update` | Update existing documentation in-place |
-| `scribe:review` | Review documentation for accuracy and completeness |
+Skills are specialised behavioral modules in `skills/`. Each skill defines a focused identity and rules for a specific type of work. Invoke them explicitly with their commands — there are no automatic triggers. Each skill file lists its own commands in a `## Commands` table. See `COMMANDS.md` for the full list.
 
 ---
 

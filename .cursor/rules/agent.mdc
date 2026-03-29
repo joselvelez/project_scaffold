@@ -81,7 +81,7 @@ If "push" appears without a qualifier, respond: "Which type — `push:breaking`,
 | --- | --- |
 | `scribe:document` | Document a new component, module, or system |
 | `scribe:update` | Update existing documentation in place |
-| `scribe:adr` | Write an architectural decision record |
+| `scribe:review` | Full top-down codebase and documentation alignment review |
 | `invokescribe` | Activate for any documentation task |
 
 When a skill command is detected:

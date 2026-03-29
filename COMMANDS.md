@@ -23,7 +23,7 @@ Commands are natural language trigger phrases recognised by any AI tool working 
 | --- | --- |
 | `scribe:document` | Document a new component, module, or system |
 | `scribe:update` | Update existing documentation in place |
-| `scribe:adr` | Write an architectural decision record |
+| `scribe:review` | Full top-down codebase and documentation alignment review |
 | `invokescribe` | Activate for any documentation task |
 
 ---
