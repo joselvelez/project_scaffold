@@ -177,6 +177,15 @@ if [[ -f "$PACKAGE_JSON" ]]; then
   echo "  ✓ package.json → $NEW_VERSION"
 fi
 
+# ── Bump version in scaffold.json (if it exists) ─────────────────────────────
+
+SCAFFOLD_JSON="$ROOT/scaffold.json"
+if [[ -f "$SCAFFOLD_JSON" ]]; then
+  sed "s/\"version\": \"$CURRENT_VERSION\"/\"version\": \"$NEW_VERSION\"/" "$SCAFFOLD_JSON" > "$SCAFFOLD_JSON.tmp"
+  mv "$SCAFFOLD_JSON.tmp" "$SCAFFOLD_JSON"
+  echo "  ✓ scaffold.json → $NEW_VERSION"
+fi
+
 # ── Update CHANGELOG.md ──────────────────────────────────────────────────────
 
 # Write unreleased content to a temp file so awk can read it without

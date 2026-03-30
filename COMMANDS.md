@@ -36,13 +36,13 @@ Shorthand triggers appended to the end of a message. The AI tool expands them in
 
 | Trigger | Expands to |
 | --- | --- |
-| `/proceed` | Review the relevant documentation (the project README.md file as well as any docs within the /docs directory). |
+| `/begin` | Review the relevant documentation (the project README.md file as well as any docs within the /docs directory). |
 | `/doublecheck` | Did you read all the docs? Did you read all the relevant code? |
 | `/proceed` | Proceed. Make sure to include detailed JSDOCs. I want you to work systematically on this. Create a todo list and track your progress. |
 
 ### Full expansion text
 
-### `/proceed`
+### `/begin`
 
 Review the relevant documentation (the project README.md file as well as any docs within the /docs directory).
 

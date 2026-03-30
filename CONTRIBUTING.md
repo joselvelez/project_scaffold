@@ -24,6 +24,7 @@ The version must be identical in every location it appears.
 | `{{PROJECT_NAME}}.md` header | Always matches `VERSION`. |
 | `CHANGELOG.md` | Every release entry carries the version. |
 | `package.json` | JS/TS projects only. `"version"` field must match `VERSION`. |
+| `scaffold.json` | Template repo only. `"version"` field must match `VERSION`. |
 | Git tag | `vX.Y.Z` applied at every release. |
 | GitHub Release | Created from the git tag. |
 
@@ -51,6 +52,12 @@ Read it top to bottom. Answer each question. The first **Yes** determines your c
 
 ---
 
+## Prerequisites
+
+`bin/release` requires the [GitHub CLI (`gh`)](https://cli.github.com/) to be installed and authenticated. It is used to create the GitHub release as the final step of the release process.
+
+---
+
 ## Release process
 
 When you issue a push command, the AI tool presents a **single confirmation prompt** and then runs `bin/release` — one command that does everything.
@@ -58,7 +65,7 @@ When you issue a push command, the AI tool presents a **single confirmation prom
 1. **Presents a release summary** — current version, new version, and the changelog entries to be released.
 2. **Waits for one confirmation** — does not modify any file until you say "yes." This is the only prompt.
 3. **Runs `bin/release <type>`** — a single command that handles the entire release:
-   - Bumps the version in `VERSION`, project `.md` header, and `package.json` (if present)
+   - Bumps the version in `VERSION`, project `.md` header, `package.json` (if present), and `scaffold.json` (if present)
    - Moves `[Unreleased]` entries in `CHANGELOG.md` into a new versioned section with today's date
    - `git add -A && git commit`
    - `git tag -a vX.Y.Z`
@@ -83,7 +90,7 @@ Skills are specialised behavioral modules in `skills/`. Each skill defines a foc
 
 ## Updating AI tool files
 
-`CLAUDE.md`, `.cursor/rules/agent.mdc`, `.github/copilot-instructions.md`, `.clinerules`, and `.roo/rules/agent.md` are generated files. Never edit them directly.
+`CLAUDE.md`, `tooling/claude.md`, `.cursor/rules/agent.mdc`, `.github/copilot-instructions.md`, `.clinerules`, and `.roo/rules/agent.md` are generated files. Never edit them directly.
 
 To update them — after adding a skill or running `context:generate`:
 

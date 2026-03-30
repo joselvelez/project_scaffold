@@ -31,7 +31,13 @@ require_file() {
 
 cmd_status() {
   local version_file="$ROOT/VERSION"
+
+  # Use .scaffold/CHANGELOG.md if it exists (template repo),
+  # otherwise use CHANGELOG.md (derived projects).
   local changelog_file="$ROOT/CHANGELOG.md"
+  if [[ -f "$ROOT/.scaffold/CHANGELOG.md" ]]; then
+    changelog_file="$ROOT/.scaffold/CHANGELOG.md"
+  fi
 
   require_file "$version_file"
   require_file "$changelog_file"

@@ -10,6 +10,36 @@ Format: [Semantic Versioning](https://semver.org/). Dates are YYYY-MM-DD.
 
 ---
 
+## [0.11.0] — 2026-03-30
+
+- Update `README.md`
+- Fixed `tooling/agent-instructions.md` push command section to explicitly instruct agents to read `[Unreleased]` from `.scaffold/CHANGELOG.md` when it exists; agents were defaulting to `CHANGELOG.md` (which has an empty `[Unreleased]` section in the template repo)
+- Fixed `tooling/agent-instructions.md` Key files table to mention `.scaffold/CHANGELOG.md` fallback alongside `CHANGELOG.md`
+- Fixed CONTRIBUTING.md release process description to include scaffold.json version bump (scribe:review finding #001)
+- Added tooling/claude.md to the generated files list in CONTRIBUTING.md (scribe:review finding #002)
+- Added Prerequisites section to CONTRIBUTING.md documenting the GitHub CLI (gh) dependency required by bin/release (scribe:review finding #003)
+- Fixed bin/project to use .scaffold/CHANGELOG.md fallback, matching bin/release behavior (scribe:review finding #004)
+
+
+### Fixed
+- `prompts/begin.md` — renamed trigger from `# /proceed` to `# /begin`; was producing duplicate `/proceed` entries in all generated adapter files since both `begin.md` and `proceed.md` declared the same trigger
+- `scaffold.json` — updated version from `0.9.0` to `0.10.0` to match `VERSION`; was out of sync since the 0.10.0 release
+
+### Added
+- `bin/release` — now bumps `scaffold.json` version (if present) alongside `VERSION`, `package.json`, and project `.md` header; prevents scaffold manifest version drift on future releases
+- `CONTRIBUTING.md` — added `scaffold.json` to "Where the version lives" table (template repo only)
+- `README.md` — added `prompts/begin.md` and `skills/context.md` to the file tree
+- `README.md` — added Context Generator skill mention to §"Skill commands" narrative (both shipped skills now documented)
+- `README.md` — added note near file tree that `scaffold.json` and `.scaffold/` are template-only files removed by `setup.sh`
+- `README.md` — added note that `.github/` contains only the generated Copilot file — no CI/CD config by design
+- `README.md` — added note to §"Two independent version tracks" explaining `PROJECT.md` stays at `v0.1.0` as the template default
+- `README.md` — added default upstream URL to §"Custom upstream"
+
+### Changed
+- `skills/scribe.md` — added Resolution Phase to `scribe:review`: after presenting findings, walk through each one individually with the user (present, propose, confirm, then next); no batch-mode resolution
+- `skills/scribe.md` — added No-Action Documentation Rule to `scribe:review`: findings resolved as "no action" must be documented in the relevant file so future reviews don't re-surface them; an undocumented no-action finding is not resolved
+- Regenerated all adapter files (`tooling/claude.md`, `COMMANDS.md`, `.cursor/rules/agent.mdc`, `.github/copilot-instructions.md`, `.clinerules`, `.roo/rules/agent.md`)
+
 ## [0.10.0] — 2026-03-30
 
 ### Added

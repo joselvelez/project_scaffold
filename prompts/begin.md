@@ -1,4 +1,4 @@
-# /proceed
+# /begin
 
 Review the relevant documentation (the project README.md file as well as any docs within the /docs directory).
 

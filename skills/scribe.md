@@ -156,3 +156,22 @@ If a phase produced no misalignments, state it explicitly:
 #### Completion Criteria
 
 The review is complete when all three phases have been executed in full and every finding has been recorded. Do not stop early. Do not omit findings because they seem minor — severity classification is for the user to act on, not a filter for what gets reported.
+
+#### Resolution Phase
+
+After presenting the full findings report, walk through each finding individually with the user. Do not batch them. Do not rush.
+
+For each finding:
+
+1. **Present the finding** — restate the discrepancy clearly.
+2. **Propose a resolution** — suggest a specific fix, documentation addition, or "no action" with rationale.
+3. **Wait for user confirmation** — do not move to the next finding until the user confirms.
+4. **Record the decision** — track the agreed resolution for implementation.
+
+Only after all findings have been individually discussed and resolved, proceed to implementation.
+
+#### No-Action Documentation Rule
+
+When a finding is resolved as "intentional" or "no action needed," the gap must still be documented in the codebase — typically in the relevant documentation file (e.g., `README.md`, the system document, or inline comments). The documentation must make the intentional nature of the behavior explicit so that future `scribe:review` runs do not re-surface the same finding.
+
+A finding resolved as "no action" without corresponding documentation is not resolved — it will recur on the next review. The review is not complete until every no-action finding has been documented.
