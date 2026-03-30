@@ -21,6 +21,8 @@ Commands are natural language trigger phrases recognised by any AI tool working 
 
 | Command | What it does |
 | --- | --- |
+| `context:generate` | Read the project's system document in full and generate `project-context.md` using this skill |
+| `context:check` | Read both the system document and the current `project-context.md` and report what is missing, outdated, or inconsistent — without regenerating the file |
 | `scribe:document` | Document a new component, module, or system |
 | `scribe:update` | Update existing documentation in place |
 | `scribe:review` | Full top-down codebase and documentation alignment review |
@@ -94,6 +96,7 @@ bin/project status     # version, last release, unreleased changes
 bin/project commands   # display this reference
 bin/project help       # usage information
 bin/release <type> [summary]  # run a release (major, minor, patch)
+bin/update [--yes | --core-only]  # pull scaffold infrastructure updates
 ```
 
 ---

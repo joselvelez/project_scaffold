@@ -1,0 +1,330 @@
+#!/usr/bin/env bash
+#
+# bin/update — Pull scaffold infrastructure updates from the template repo.
+#
+# Fetches the remote scaffold.json manifest, compares versions, and updates
+# core infrastructure files. New skills and prompts are offered interactively.
+# Deprecated files listed in the manifest's "removed" array are deleted.
+#
+# Usage:
+#   bin/update [options]
+#
+#   --yes         Accept all new skills/prompts without prompting
+#   --core-only   Update core files only, skip new skills/prompts entirely
+#
+# Configuration:
+#   Override the upstream URL by creating a .scaffold-upstream file in the
+#   project root containing the raw base URL (no trailing slash).
+#
+# This script must be run from the repository root.
+
+set -euo pipefail
+
+# ── Upstream URL ──────────────────────────────────────────────────────────────
+
+# Default upstream — override by creating .scaffold-upstream with your URL
+DEFAULT_UPSTREAM="https://raw.githubusercontent.com/velezjose/project_scaffold/main"
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$(dirname "$SCRIPT_DIR")"
+
+if [[ -f "$ROOT/.scaffold-upstream" ]]; then
+  UPSTREAM="$(cat "$ROOT/.scaffold-upstream" | tr -d '[:space:]')"
+else
+  UPSTREAM="$DEFAULT_UPSTREAM"
+fi
+
+# ── Parse arguments ───────────────────────────────────────────────────────────
+
+MODE="interactive"  # interactive | yes | core-only
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --yes)
+      MODE="yes"
+      shift
+      ;;
+    --core-only)
+      MODE="core-only"
+      shift
+      ;;
+    *)
+      echo "Error: unknown option '$1'" >&2
+      echo "Usage: bin/update [--yes | --core-only]" >&2
+      exit 1
+      ;;
+  esac
+done
+
+# ── Guards ────────────────────────────────────────────────────────────────────
+
+SCAFFOLD_VERSION_FILE="$ROOT/.scaffold-version"
+
+if [[ ! -f "$SCAFFOLD_VERSION_FILE" ]]; then
+  echo "Error: .scaffold-version not found. Is this a project created from the scaffold template?" >&2
+  exit 1
+fi
+
+LOCAL_VERSION="$(cat "$SCAFFOLD_VERSION_FILE" | tr -d '[:space:]')"
+
+if [[ ! "$LOCAL_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "Error: .scaffold-version contains invalid version '$LOCAL_VERSION'" >&2
+  exit 1
+fi
+
+# ── Helper: semver comparison ─────────────────────────────────────────────────
+# Returns 0 if $1 < $2 (update available), 1 otherwise.
+
+semver_lt() {
+  awk -v a="$1" -v b="$2" 'BEGIN {
+    split(a, av, ".")
+    split(b, bv, ".")
+    for (i = 1; i <= 3; i++) {
+      if (av[i]+0 < bv[i]+0) exit 0
+      if (av[i]+0 > bv[i]+0) exit 1
+    }
+    exit 1
+  }'
+}
+
+# ── Helper: download a file from upstream ─────────────────────────────────────
+# Usage: download_file <remote_path> <local_dest>
+# Exits with error on failure.
+
+download_file() {
+  local remote_path="$1"
+  local local_dest="$2"
+  local url="${UPSTREAM}/${remote_path}"
+  local http_code
+
+  http_code="$(curl -sSL -w '%{http_code}' -o "$local_dest" "$url" 2>/dev/null)" || {
+    echo "Error: network failure fetching $url" >&2
+    return 1
+  }
+
+  if [[ "$http_code" != "200" ]]; then
+    echo "Error: HTTP $http_code fetching $url" >&2
+    rm -f "$local_dest"
+    return 1
+  fi
+}
+
+# ── Helper: parse JSON arrays (portable, no jq dependency) ────────────────────
+# Extracts string values from a JSON array field.
+# Usage: json_array <file> <field_name>
+
+json_array() {
+  local file="$1"
+  local field="$2"
+  awk -v field="\"$field\"" '
+    BEGIN { in_array=0 }
+    $0 ~ field ":" { in_array=1; next }
+    in_array && /\]/ { in_array=0; next }
+    in_array {
+      gsub(/[",[:space:]]/, "")
+      if ($0 != "") print
+    }
+  ' "$file"
+}
+
+# ── Helper: read JSON string field ────────────────────────────────────────────
+# Usage: json_string <file> <field_name>
+
+json_string() {
+  local file="$1"
+  local field="$2"
+  awk -v field="\"$field\"" '
+    $0 ~ field ":" {
+      gsub(/.*:/, "")
+      gsub(/[",[:space:]]/, "")
+      print
+      exit
+    }
+  ' "$file"
+}
+
+# ── Fetch remote manifest ────────────────────────────────────────────────────
+
+TMPDIR="$(mktemp -d)"
+trap 'rm -rf "$TMPDIR"' EXIT
+
+echo "Fetching scaffold manifest from upstream..."
+
+if ! download_file "scaffold.json" "$TMPDIR/scaffold.json"; then
+  echo "Error: could not fetch scaffold.json from $UPSTREAM" >&2
+  exit 1
+fi
+
+REMOTE_VERSION="$(json_string "$TMPDIR/scaffold.json" "version")"
+
+if [[ -z "$REMOTE_VERSION" || ! "$REMOTE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "Error: remote scaffold.json contains invalid version '$REMOTE_VERSION'" >&2
+  exit 1
+fi
+
+# ── Version comparison ────────────────────────────────────────────────────────
+
+echo "Local scaffold version:  $LOCAL_VERSION"
+echo "Remote scaffold version: $REMOTE_VERSION"
+
+if ! semver_lt "$LOCAL_VERSION" "$REMOTE_VERSION"; then
+  echo ""
+  echo "Already up to date."
+  exit 0
+fi
+
+echo ""
+echo "Update available: $LOCAL_VERSION → $REMOTE_VERSION"
+echo ""
+
+# ── Download core files to temp directory ─────────────────────────────────────
+
+CORE_FILES=()
+while IFS= read -r file; do
+  CORE_FILES+=("$file")
+done < <(json_array "$TMPDIR/scaffold.json" "core")
+
+echo "Updating core files..."
+
+for file in "${CORE_FILES[@]}"; do
+  mkdir -p "$TMPDIR/$(dirname "$file")"
+  if ! download_file "$file" "$TMPDIR/$file"; then
+    echo "Error: failed to download $file — aborting update." >&2
+    exit 1
+  fi
+done
+
+echo "  ✓ All core files downloaded"
+
+# ── Process removed files ────────────────────────────────────────────────────
+
+REMOVED_FILES=()
+while IFS= read -r file; do
+  [[ -n "$file" ]] && REMOVED_FILES+=("$file")
+done < <(json_array "$TMPDIR/scaffold.json" "removed")
+
+for file in "${REMOVED_FILES[@]}"; do
+  if [[ -f "$ROOT/$file" ]]; then
+    rm -f "$ROOT/$file"
+    echo "  ✗ Removed deprecated file: $file"
+  fi
+done
+
+# ── Move core files into place ────────────────────────────────────────────────
+
+for file in "${CORE_FILES[@]}"; do
+  mkdir -p "$ROOT/$(dirname "$file")"
+  cp "$TMPDIR/$file" "$ROOT/$file"
+  # Preserve executable bit for bin/ files
+  if [[ "$file" == bin/* ]]; then
+    chmod +x "$ROOT/$file"
+  fi
+done
+
+echo "  ✓ Core files updated"
+
+# ── Offer new skills ─────────────────────────────────────────────────────────
+
+if [[ "$MODE" != "core-only" ]]; then
+  REMOTE_SKILLS=()
+  while IFS= read -r file; do
+    REMOTE_SKILLS+=("$file")
+  done < <(json_array "$TMPDIR/scaffold.json" "skills")
+
+  NEW_SKILLS=()
+  for file in "${REMOTE_SKILLS[@]}"; do
+    if [[ ! -f "$ROOT/$file" ]]; then
+      NEW_SKILLS+=("$file")
+    fi
+  done
+
+  if [[ ${#NEW_SKILLS[@]} -gt 0 ]]; then
+    echo ""
+    echo "New skills available:"
+    for file in "${NEW_SKILLS[@]}"; do
+      if [[ "$MODE" == "yes" ]]; then
+        mkdir -p "$TMPDIR/$(dirname "$file")"
+        if download_file "$file" "$TMPDIR/$file"; then
+          mkdir -p "$ROOT/$(dirname "$file")"
+          cp "$TMPDIR/$file" "$ROOT/$file"
+          echo "  + Added: $file"
+        fi
+      else
+        printf "  Add %s? [y/N] " "$file"
+        read -r answer
+        if [[ "$answer" =~ ^[Yy]$ ]]; then
+          mkdir -p "$TMPDIR/$(dirname "$file")"
+          if download_file "$file" "$TMPDIR/$file"; then
+            mkdir -p "$ROOT/$(dirname "$file")"
+            cp "$TMPDIR/$file" "$ROOT/$file"
+            echo "  + Added: $file"
+          fi
+        else
+          echo "  - Skipped: $file"
+        fi
+      fi
+    done
+  fi
+
+  # ── Offer new prompts ─────────────────────────────────────────────────────
+
+  REMOTE_PROMPTS=()
+  while IFS= read -r file; do
+    REMOTE_PROMPTS+=("$file")
+  done < <(json_array "$TMPDIR/scaffold.json" "prompts")
+
+  NEW_PROMPTS=()
+  for file in "${REMOTE_PROMPTS[@]}"; do
+    if [[ ! -f "$ROOT/$file" ]]; then
+      NEW_PROMPTS+=("$file")
+    fi
+  done
+
+  if [[ ${#NEW_PROMPTS[@]} -gt 0 ]]; then
+    echo ""
+    echo "New prompts available:"
+    for file in "${NEW_PROMPTS[@]}"; do
+      if [[ "$MODE" == "yes" ]]; then
+        mkdir -p "$TMPDIR/$(dirname "$file")"
+        if download_file "$file" "$TMPDIR/$file"; then
+          mkdir -p "$ROOT/$(dirname "$file")"
+          cp "$TMPDIR/$file" "$ROOT/$file"
+          echo "  + Added: $file"
+        fi
+      else
+        printf "  Add %s? [y/N] " "$file"
+        read -r answer
+        if [[ "$answer" =~ ^[Yy]$ ]]; then
+          mkdir -p "$TMPDIR/$(dirname "$file")"
+          if download_file "$file" "$TMPDIR/$file"; then
+            mkdir -p "$ROOT/$(dirname "$file")"
+            cp "$TMPDIR/$file" "$ROOT/$file"
+            echo "  + Added: $file"
+          fi
+        else
+          echo "  - Skipped: $file"
+        fi
+      fi
+    done
+  fi
+fi
+
+# ── Regenerate adapter files ─────────────────────────────────────────────────
+
+echo ""
+echo "Regenerating AI tool adapter files..."
+bash "$ROOT/skills/sync.sh"
+echo "  ✓ Adapter files regenerated"
+
+# ── Update .scaffold-version ─────────────────────────────────────────────────
+# Only written after all operations succeed (we're past all exit points).
+
+echo "$REMOTE_VERSION" > "$SCAFFOLD_VERSION_FILE"
+
+# ── Summary ──────────────────────────────────────────────────────────────────
+
+echo ""
+echo "Done. Scaffold updated: $LOCAL_VERSION → $REMOTE_VERSION"
+echo ""
+echo "Review the changes, then commit:"
+echo "  git add -A && git commit -m \"chore: update scaffold to $REMOTE_VERSION\""

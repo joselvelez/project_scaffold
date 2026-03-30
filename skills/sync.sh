@@ -325,6 +325,7 @@ bin/project status     # version, last release, unreleased changes
 bin/project commands   # display this reference
 bin/project help       # usage information
 bin/release <type> [summary]  # run a release (major, minor, patch)
+bin/update [--yes | --core-only]  # pull scaffold infrastructure updates
 ```
 
 ---

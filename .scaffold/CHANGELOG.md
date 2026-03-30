@@ -10,6 +10,18 @@ Format: [Semantic Versioning](https://semver.org/). Dates are YYYY-MM-DD.
 
 ---
 
+## [0.10.0] — 2026-03-30
+
+### Added
+- `scaffold.json` — manifest declaring scaffold version, core infrastructure files, skills, prompts, and removed files; lives in the template repo only — deleted by `setup.sh` during project setup
+- `bin/update` — shell script that pulls scaffold infrastructure updates from the template repo; supports `--yes` (auto-accept new files) and `--core-only` (skip new skills/prompts) flags; uses proper semver comparison via awk; downloads to temp directory with atomic move; configurable upstream URL via `.scaffold-upstream` file; handles deprecated files via manifest `removed` array
+- `.scaffold-version` tracking — `setup.sh` now reads the scaffold version from `scaffold.json` and writes it to `.scaffold-version` before deleting the manifest; `bin/update` updates `.scaffold-version` after successful updates
+- "Keeping up to date" section in `README.md` documenting `bin/update` usage, update behavior categories, independent version tracks, and custom upstream configuration
+
+### Changed
+- `setup.sh` — added `.scaffold-version` creation from `scaffold.json`, `scaffold.json` deletion, and `bin/update` to post-setup summary output
+- `README.md` — added `.scaffold-version` and `bin/update` to file tree
+
 ## [0.9.0] — 2026-03-30
 
 ### Changed

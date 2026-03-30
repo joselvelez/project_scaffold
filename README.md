@@ -36,6 +36,7 @@ your-project/
 ├── CONTRIBUTING.md                    ← versioning rules and push commands
 ├── CHANGELOG.md                       ← chronological change record
 ├── VERSION                            ← single canonical version number
+├── .scaffold-version                  ← scaffold version at time of setup (updated by bin/update)
 ├── LICENSE                            ← MIT, with your name and year
 ├── .gitignore                         ← sensible defaults for most stacks
 ├── assets/
@@ -45,7 +46,8 @@ your-project/
 │   └── README.md
 ├── bin/
 │   ├── project                        ← CLI for read-only commands (no agent needed)
-│   └── release                        ← automated release script (version, changelog, git, GitHub)
+│   ├── release                        ← automated release script (version, changelog, git, GitHub)
+│   └── update                         ← pull scaffold infrastructure updates from the template repo
 ├── prompts/
 │   ├── doublecheck.md                 ← /doublecheck prompt macro
 │   └── proceed.md                     ← /proceed prompt macro
@@ -273,6 +275,43 @@ All adapter files are generated from the same source by `skills/sync.sh`. They s
 3. Check **Template repository**
 
 The **Use this template** button will appear on the repo page.
+
+---
+
+## Keeping up to date
+
+Projects created from this template are independent repositories with no git relationship to the original. When the scaffold improves — bug fixes in `bin/release`, new skills, updated infrastructure — those improvements do not flow automatically.
+
+`bin/update` solves this. It fetches the scaffold manifest from the template repo, compares versions, and updates core infrastructure files while leaving your customizations untouched.
+
+```
+bin/update              # interactive — prompts for new skills/prompts
+bin/update --yes        # accept all new skills/prompts automatically
+bin/update --core-only  # update infrastructure only, skip new skills/prompts
+```
+
+### What gets updated
+
+| Category | Behavior |
+| --- | --- |
+| **Core infrastructure** (`bin/release`, `bin/project`, `bin/update`, `skills/sync.sh`, `tooling/README.md`) | Always overwritten — pure infrastructure |
+| **New skills** (skills not present locally) | Offered interactively (or auto-accepted with `--yes`) |
+| **New prompts** (prompts not present locally) | Offered interactively (or auto-accepted with `--yes`) |
+| **Existing skills and prompts** | Never touched — your customizations are preserved |
+| **Deprecated files** | Removed automatically if listed in the manifest |
+| **User-edited files** (`tooling/agent-instructions.md`, `YourProject.md`, `README.md`, etc.) | Never touched |
+
+### Two independent version tracks
+
+The scaffold version (tracked in `.scaffold-version`) is completely independent of your project version (tracked in `VERSION`). Running `push:fix` on your project does not affect the scaffold version, and running `bin/update` does not affect your project version.
+
+### Custom upstream
+
+By default, `bin/update` fetches from this template repo. To use a fork or internal mirror, create a `.scaffold-upstream` file in your project root containing the raw base URL:
+
+```
+https://raw.githubusercontent.com/your-org/your-scaffold-fork/main
+```
 
 ---
 
