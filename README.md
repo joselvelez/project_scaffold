@@ -29,7 +29,7 @@ Without a deliberate foundation, things drift. Documentation goes stale. Changel
 your-project/
 ├── README.md                          ← project README (personalised during setup)
 ├── YourProject.md                     ← living system document — always current
-├── project-context.md                 ← edit this to update AI tool context
+├── project-context.md                 ← generated — run context:generate to update
 ├── CLAUDE.md                          ← generated — never edit directly
 ├── COMMANDS.md                        ← generated — never edit directly
 ├── .cursor/rules/agent.mdc            ← generated — never edit directly
@@ -75,13 +75,13 @@ graph LR
     end
 
     subgraph UserEdited["User-edited — you maintain these directly"]
-        project-context.md
         tooling/agent-instructions.md
         skills/*.md
         prompts/*.md
     end
 
-    subgraph Generated["Generated — never edit, produced by sync.sh"]
+    subgraph Generated["Generated — never edit, produced by sync.sh or context:generate"]
+        project-context.md
         CLAUDE.md
         tooling/claude.md
         COMMANDS.md
@@ -137,11 +137,11 @@ flowchart LR
 
 ### AI tool files are generated, not authored
 
-`CLAUDE.md`, `tooling/claude.md`, `COMMANDS.md`, `.cursor/rules/agent.mdc`, `.github/copilot-instructions.md`, `.clinerules`, and `.roo/rules/agent.md` are build artifacts. They are produced by `skills/sync.sh` from the skill files in `skills/`, prompt macros in `prompts/`, project context in `project-context.md`, and agent instructions in `tooling/agent-instructions.md`. You never write these files directly.
+`CLAUDE.md`, `tooling/claude.md`, `COMMANDS.md`, `.cursor/rules/agent.mdc`, `.github/copilot-instructions.md`, `.clinerules`, and `.roo/rules/agent.md` are build artifacts. They are produced by `skills/sync.sh` from the skill files in `skills/`, prompt macros in `prompts/`, project context in `project-context.md` (itself generated via `context:generate`), and agent instructions in `tooling/agent-instructions.md`. You never write these files directly.
 
 ![Scaffold architecture](assets/scaffold-architecture.svg)
 
-**To update AI tool files** — after adding a skill or editing `project-context.md`:
+**To update AI tool files** — after adding a skill or running `context:generate`:
 
 ```
 bash skills/sync.sh
@@ -202,7 +202,7 @@ For the complete command reference — including AI chat commands and CLI comman
    ```
 5. Answer five prompts: project name, description, platform, author name, and whether it's a JS/TS project
 6. Fill in `YourProject.md` with your system design
-7. Add project context to `project-context.md`, then run `bash skills/sync.sh`
+7. Run `context:generate` in your AI tool to generate `project-context.md` from your system document
 
 ### Option 2 — Clone and reset
 
@@ -262,7 +262,7 @@ The full release process is in `CONTRIBUTING.md`.
 | **Roo Code** | `.roo/rules/agent.md` | Automatically read from `.roo/rules/` |
 | **Other tools** | `tooling/claude.md` | Point the tool at `tooling/claude.md` — the full generated instructions |
 
-All adapter files are generated from the same source by `skills/sync.sh`. They share the same agent instructions; `.cursor/rules/agent.mdc` additionally includes MDC frontmatter required by Cursor. If you add a skill or update `project-context.md`, run `bash skills/sync.sh` and commit the regenerated files.
+All adapter files are generated from the same source by `skills/sync.sh`. They share the same agent instructions; `.cursor/rules/agent.mdc` additionally includes MDC frontmatter required by Cursor. If you add a skill or run `context:generate`, run `bash skills/sync.sh` and commit the regenerated files.
 
 ---
 

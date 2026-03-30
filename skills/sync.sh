@@ -3,14 +3,14 @@
 #
 # Reads tooling/agent-instructions.md as the canonical template and generates
 # tool-specific adapter files by replacing placeholder comment lines with
-# dynamic content aggregated from skills/*.md, prompts/*.md, and project-context.md.
+# dynamic content aggregated from skills/*.md, prompts/*.md, and project-context.md (generated via context:generate).
 #
 # Run this after adding or modifying a skill, prompt macro, or agent instruction:
 #   bash skills/sync.sh
 #
 # Source files (edit these):
 #   tooling/agent-instructions.md  — agent behaviour (the template)
-#   project-context.md                     — project-specific context
+#   project-context.md                     — generated via context:generate from the system document
 #   skills/*.md                    — skill definitions with ## Commands tables
 #   prompts/*.md                   — prompt macro definitions
 #
@@ -212,7 +212,7 @@ build_project_context_replacement() {
   if [[ -f "$PROJECT_CONTEXT" ]]; then
     cat "$PROJECT_CONTEXT"
   else
-    echo "_No project context yet. Edit \`project-context.md\` to add it, then run \`bash skills/sync.sh\`._"
+    echo "_No project context yet. Run \`context:generate\` to generate it from your system document, then run \`bash skills/sync.sh\`._"
   fi
 }
 

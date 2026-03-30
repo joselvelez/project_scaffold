@@ -10,6 +10,18 @@ Format: [Semantic Versioning](https://semver.org/). Dates are YYYY-MM-DD.
 
 ---
 
+## [0.9.0] — 2026-03-30
+
+### Changed
+- `project-context.md` is now a generated file — replaced manual-edit instructions with a "generated file" header; content is produced by `context:generate` skill command from the system document, then consumed by `sync.sh`
+- `setup.sh` — updated "Next steps" output to direct users to run `context:generate` instead of manually editing `project-context.md`
+- `tooling/agent-instructions.md` — added "After any change to `{PROJECT_NAME}.md`" rule requiring agents to run `context:generate` then `sync.sh`; updated Key files table entry for `project-context.md` from "Edit this" to "Generated via context:generate"
+- `skills/sync.sh` — updated header comments and fallback message to reflect `project-context.md` is now generated, not manually edited
+- `README.md` — updated file tree annotation, mermaid file-category diagram (moved `project-context.md` from "User-edited" to "Generated"), Quick Start step 7, generated files description, and AI tool support section to reflect new `context:generate` workflow
+- `CONTRIBUTING.md` — updated "Updating AI tool files" section to reference `context:generate` instead of manual editing
+- `tooling/README.md` — updated source files list, architecture diagram, and description to reflect `project-context.md` is generated
+- Regenerated all adapter files (`tooling/claude.md`, `COMMANDS.md`, `.cursor/rules/agent.mdc`, `.github/copilot-instructions.md`, `.clinerules`, `.roo/rules/agent.md`)
+
 ## [0.8.0] — 2026-03-29
 
 ### Changed

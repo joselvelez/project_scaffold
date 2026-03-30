@@ -136,7 +136,7 @@ echo "  tooling/agent-instructions.md    ← source of truth — edit this, not 
 echo ""
 echo "Next steps:"
 echo "  1. Fill in ${PROJECT_NAME}.md with your system design"
-echo "  2. Add project context to project-context.md, then run: bash skills/sync.sh"
+echo "  2. Run context:generate in your AI tool to generate project-context.md from ${PROJECT_NAME}.md"
 if [ "$PROJECT_TYPE_INPUT" = "1" ]; then
   echo "  3. Set \"version\": \"0.1.0\" in your package.json"
 fi

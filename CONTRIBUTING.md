@@ -85,7 +85,7 @@ Skills are specialised behavioral modules in `skills/`. Each skill defines a foc
 
 `CLAUDE.md`, `.cursor/rules/agent.mdc`, `.github/copilot-instructions.md`, `.clinerules`, and `.roo/rules/agent.md` are generated files. Never edit them directly.
 
-To update them — after adding a skill or editing `project-context.md`:
+To update them — after adding a skill or running `context:generate`:
 
 ```
 bash skills/sync.sh
