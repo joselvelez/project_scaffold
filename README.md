@@ -40,7 +40,7 @@ Without a deliberate foundation, things drift. Documentation goes stale. Changel
 6. Fill in `YourProject.md` with your system design
 7. Run `context:generate` in your AI tool to generate `project-context.md` from your system document
 
-That's it. Your AI tool files are generated, your structure is in place, and `setup.sh` deletes itself when it's done.
+That's it. Your AI tool files are generated, your structure is in place, the initial commit is pushed, and `setup.sh` deletes itself when it's done.
 
 ### Option 2 — Clone and reset
 
@@ -48,15 +48,11 @@ That's it. Your AI tool files are generated, your structure is in place, and `se
 git clone <this-repo-url> my-project
 cd my-project
 rm -rf .git && git init
+git remote add origin <your-repo-url>
 bash setup.sh
 ```
 
-After setup, configure your remote:
-
-```bash
-git remote add origin <your-repo-url>
-git push -u origin main
-```
+> **Note:** `setup.sh` commits, tags, and pushes automatically. A git remote named `origin` must be configured before running the script.
 
 ### What setup.sh does
 
@@ -67,10 +63,11 @@ flowchart TD
     Q --> RN["Renames PROJECT.md<br/>to YourProject.md"]
     Q --> RP["Replaces all placeholders<br/>in every file"]
     Q --> RS["Swaps README.template.md<br/>to README.md"]
-    Q --> JS["Removes package.json row<br/>if not a JS/TS project"]
+    Q --> PJ["JS/TS: creates or updates<br/>package.json to 0.1.0"]
     Q --> SY["Runs skills/sync.sh<br/>generates AI tool files"]
+    Q --> GIT["Commits, tags v0.1.0,<br/>and pushes to origin"]
     Q --> SD["Deletes itself —<br/>setup.sh is gone"]
-    RN & RP & RS & JS & SY & SD --> D["Project is ready"]
+    RN & RP & RS & PJ & SY & GIT & SD --> D["Project is ready"]
 ```
 
 ---

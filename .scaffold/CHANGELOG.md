@@ -10,6 +10,12 @@ Format: [Semantic Versioning](https://semver.org/). Dates are YYYY-MM-DD.
 
 ---
 
+## [0.11.2] — 2026-03-31
+
+### Changed
+- `setup.sh` — automated the end-of-setup workflow: JS/TS projects now get `package.json` created (or version updated) to `0.1.0` automatically; setup now commits (`Initial scaffold`), tags (`v0.1.0`), and pushes to `origin main` without manual intervention; fails loudly if no git remote is configured; self-cleanup moved before git commands so the deletion is captured in the initial commit; removed manual "Next steps" and "When ready to commit" instructions from output
+- `README.md` — updated mermaid flowchart to reflect package.json handling and git automation; updated "Option 2" instructions to require remote configuration before running `setup.sh`; updated "That's it" summary to mention automatic commit and push
+
 ## [0.11.1] — 2026-03-31
 
 ### Fixed
