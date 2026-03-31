@@ -10,6 +10,12 @@ Format: [Semantic Versioning](https://semver.org/). Dates are YYYY-MM-DD.
 
 ---
 
+## [0.11.1] — 2026-03-31
+
+### Fixed
+- `bin/update` — corrected DEFAULT_UPSTREAM GitHub username from `velezjose` to `joselvelez`; typo caused HTTP 404 when child projects ran `bin/update` because the URL pointed to a nonexistent GitHub user
+- `README.md` — corrected same `velezjose` → `joselvelez` typo in the "Custom upstream" documentation section
+
 ## [0.11.0] — 2026-03-30
 
 - Update `README.md`

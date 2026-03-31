@@ -23,7 +23,7 @@ set -euo pipefail
 # ── Upstream URL ──────────────────────────────────────────────────────────────
 
 # Default upstream — override by creating .scaffold-upstream with your URL
-DEFAULT_UPSTREAM="https://raw.githubusercontent.com/velezjose/project_scaffold/main"
+DEFAULT_UPSTREAM="https://raw.githubusercontent.com/joselvelez/project_scaffold/main"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(dirname "$SCRIPT_DIR")"

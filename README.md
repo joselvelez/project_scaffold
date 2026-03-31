@@ -229,7 +229,7 @@ In the template repo itself, `PROJECT.md` retains `v0.1.0` as the default for ne
 
 ### Custom upstream
 
-By default, `bin/update` fetches from `https://raw.githubusercontent.com/velezjose/project_scaffold/main`. To use a fork or internal mirror, create a `.scaffold-upstream` file in your project root containing the raw base URL:
+By default, `bin/update` fetches from `https://raw.githubusercontent.com/joselvelez/project_scaffold/main`. To use a fork or internal mirror, create a `.scaffold-upstream` file in your project root containing the raw base URL:
 
 ```
 https://raw.githubusercontent.com/your-org/your-scaffold-fork/main
